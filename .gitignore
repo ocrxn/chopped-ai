@@ -1,2 +1,6 @@
-database/.env
+.env
 todo.txt
+notes.txt
+__pycache__/
+*.pyc
+*.pyo
