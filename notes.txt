@@ -1,0 +1,29 @@
+    def create_db(self):
+        try:
+            conn = self.connect_db()
+            exe = conn.cursor()
+
+            create_query = """CREATE TABLE IF NOT EXISTS users (
+                id SERIAL PRIMARY KEY,      -- auto-incrementing integer
+                name VARCHAR(100) NOT NULL, -- text column
+                age INT,                     -- integer column
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP);"""
+            exe.execute(create_query)
+            conn.commit()
+        except psycopg2.Error as error:
+            print("An error has occurred.")
+        except Exception as e:
+            print(f"Exception has occurred: {e}")
+        finally:
+            exe.close()
+            conn.close()
+
+
+CREATE TABLE IF NOT EXISTS public.users
+(
+id integer NOT NULL DEFAULT nextval('users_id_seq'::regclass),
+username character varying(100) COLLATE pg_catalog."default" NOT NULL,
+password bytea NOT NULL,
+created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
+CONSTRAINT users_pkey PRIMARY KEY (id)
+)

@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title>Login</title>
+      <link rel="stylesheet" href="static/css/signup.css">
+  </head>
+  <body>
+    {% extends "template.html" %}
+    {% block content %}
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    <ul>
+      {% for category, message in messages %}
+        <li class="{{ category }}">{{ message }}</li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+{% endwith %}
+
+  <!-- Credit to Dirk Gavor https://www.sliderrevolution.com/resources/css-and-registration-login-forms/-->
+  <!-- Background shapes -->
+    <div class="bg-shapes">
+        <div class="shape"></div>
+        <div class="shape"></div>
+        <div class="shape"></div>
+        <div class="shape"></div>
+    </div>
+
+    <div class="signup-page">
+      <div class="glass-container">
+          <div class="login-header">
+              <h1>Welcome to Chopped AI</h1>
+              <p>Sign up to continue</p>
+          </div>
+          
+          <form id="signupForm" method="post" action="{{ url_for('signup') }}">
+              <div class="input-group">
+                  <i class="fas fa-user"></i>
+                  <input type="text" placeholder="Username" name="username" id="username" required>
+              </div>
+
+              <div class="input-group">
+                  <i class="fas fa-lock"></i>
+                  <input type="password" placeholder="Password" name="password" id="password" required>
+              </div>
+
+              <button type="submit" class="login-btn">Sign Up</button>
+          </form>
+      </div>
+    </div>
+
+  
+
+    {% endblock %}
+  </body>
+</html>

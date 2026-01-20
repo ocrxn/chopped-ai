@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title>{% block title %}{% endblock %}</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/template.css') }}">
+
+  </head>
+  <body>
+    <header id="top_header">
+      <div>
+        <nav>
+        <a href="{{ url_for('home') }}">
+            <img id="logo" src="{{ url_for('static', filename='images/logo.png') }}" alt="Chopped AI Logo">
+          </a>
+            <ul class="menu">
+            <li><a href="{{ url_for('home') }}">Home</a></li>
+            <li><a href="{{ url_for('about') }}">About</a></li>
+            <li><a href="{{ url_for('logout') }}">Log Out</a></li>
+          </ul>
+        </nav>
+
+      </div>
+    </header>
+    <main>
+      {% block content %} {% endblock %}
+    </main>
+
+
+ </body>
+</html>

@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title>Login</title>
+      <link rel="stylesheet" href="static/css/login.css">
+  </head>
+  <body>
+    {% extends "template.html" %}
+    {% block content %}
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    <ul>
+      {% for category, message in messages %}
+        <li class="{{ category }}">{{ message }}</li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+{% endwith %}
+
+  <!-- Credit to Dirk Gavor https://www.sliderrevolution.com/resources/css-and-registration-login-forms/-->
+  <!-- Background shapes -->
+    <div class="bg-shapes">
+        <div class="shape"></div>
+        <div class="shape"></div>
+        <div class="shape"></div>
+        <div class="shape"></div>
+    </div>
+
+    <div class="login-page">
+      <div class="glass-container">
+          <div class="login-header">
+              <h1>Welcome to Chopped AI</h1>
+              <p>Sign in to your account to continue</p>
+          </div>
+          
+          <form id="loginForm" method="post" action="{{ url_for('login') }}">
+              <div class="input-group">
+                  <i class="fas fa-user"></i>
+                  <input type="text" placeholder="Username" name="username" id="username" required>
+              </div>
+
+              <div class="input-group">
+                  <i class="fas fa-lock"></i>
+                  <input type="password" placeholder="Password" name="password" id="password" required>
+              </div>
+
+              <div class="remember-forgot">
+                  <label class="remember">
+                      <input type="checkbox" name="remember" id="remember">
+                      <span>Remember me</span>
+                  </label>
+                  <a href="#" class="forgot-link">Forgot password?</a>
+              </div>
+
+              <button type="submit" class="login-btn">Log In</button>
+
+              <p class="register-link">
+                  Don't have an account?
+                  <a href="{{ url_for('signup') }}">Sign up</a>
+              </p>
+          </form>
+      </div>
+    </div>
+
+  
+
+    {% endblock %}
+  </body>
+</html>
