@@ -15,3 +15,5 @@ DB_URL = os.getenv('DATABASE_URL')
 
 #Gmail
 MAIL_TOKEN = os.getenv('mail_token')
+SENDER_EMAIL = os.getenv('sender_email')
+EMAIL_PORT = os.getenv('email_port')

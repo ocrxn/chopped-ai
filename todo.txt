@@ -1,6 +1,3 @@
 Login Structure
     -Add email verification
         -Send code via SMTPlib
-
-Database Setup
-    -Add is_active column in db
