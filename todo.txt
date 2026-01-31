@@ -1,3 +1,0 @@
-Login Structure
-    -Add email verification
-        -Send code via SMTPlib

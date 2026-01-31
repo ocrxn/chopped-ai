@@ -3,6 +3,8 @@ from flask import Flask, render_template, redirect, url_for, session, request, f
 from dotenv import load_dotenv
 from db_conn import Connection
 from email_verif import connect_smtp
+from werkzeug.utils import secure_filename
+from config import UPLOAD_FOLDER
 
 app = Flask(__name__)
 load_dotenv()
@@ -14,13 +16,31 @@ def require_login():
         return redirect(url_for("login"))
     return None
 
-@app.route("/")
+@app.route("/", methods=["GET","POST"])
 def home():
     is_logged_out = require_login()
     if is_logged_out:
         return is_logged_out
     return render_template("home.html")
- 
+
+@app.route("/upload", methods=["GET","POST"])
+def upload():
+    is_logged_out = require_login()
+    if is_logged_out:
+        return is_logged_out
+    
+    if request.method == "GET":
+        return render_template("upload.html")
+
+    if request.method == "POST":
+        file = request.files["upload_file"]
+        filename = secure_filename(file.filename)
+        print(f"Video uploaded: {filename}")
+
+        path = os.path.join(UPLOAD_FOLDER, filename)
+        file.save(path)
+        return redirect(url_for("home"))
+
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
