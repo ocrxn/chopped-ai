@@ -5,38 +5,42 @@
 
 
 {% block content %}
-<div id="form_div">
+
   <h1> Upload Your File </h1>
   <p> Current acceptable file formats: .mp4, .mov, .webm, .mkv</p>
   <br>
   <h2>Max File Size: 1 MB</h2>
 
   <form method="POST" action="{{ url_for('upload') }}" enctype="multipart/form-data">
-    <input type="file" name="upload_file" accept=".mp4,.mov,.webm,.mkv">
+    <div id="form_div">
 
-        
-        <div id="args_div">
-          <h2>Select ffmpeg arguments (1 per category)</h2>
-          <h3>Video Format</h3>
-          <input type="radio" name="video_format" value="mp4">
-            <label>MP4</label><br>
+      <div id="upload_div">
+        <input type="file" name="upload_file" accept=".mp4,.mov,.webm,.mkv" placeholder="Upload a file">
+        <input id="upload_button" type="submit" value="upload">
+      </div>
+
           
-          <input type="radio" name="video_format" value="mov">
-            <label>MOV</label><br>
+          <div id="args_div">
+            <h2>Select ffmpeg arguments (1 per category)</h2>
+            <h3>Video Format</h3>
+            <input type="radio" name="video_format" value="mp4">
+              <label>MP4</label><br>
+            
+            <input type="radio" name="video_format" value="mov">
+              <label>MOV</label><br>
 
-          <input type="radio" name="video_format" value="webm">
-            <label>WebM</label><br>
-          
-          <input type="radio" name="video_format" value="mkv">
-            <label>MKV</label><br>
+            <input type="radio" name="video_format" value="webm">
+              <label>WebM</label><br>
+            
+            <input type="radio" name="video_format" value="mkv">
+              <label>MKV</label><br>
 
-          <h3>Includes Audio?</h3>
-          <input type="checkbox" name="audio_include" value="audio_include_box">
-            <label>Yes</label>
+            <h3>Includes Audio?</h3>
+            <input type="checkbox" name="audio_include" value="audio_include_box">
+              <label>Yes</label>
 
+          </div>
         </div>
-    <input id="upload_button" type="submit">
   </form>
-</div>
 
 {% endblock %}

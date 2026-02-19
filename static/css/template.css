@@ -81,3 +81,7 @@ nav {
 .menu a:hover {
   color: #ff9800;
 }
+
+main {
+  margin: 25px;
+}
