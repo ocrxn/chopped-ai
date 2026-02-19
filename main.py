@@ -6,6 +6,8 @@ from email_verif import connect_smtp
 from werkzeug.utils import secure_filename
 from config import UPLOAD_FOLDER, OUTPUT_FOLDER
 import json
+import subprocess
+
 
 app = Flask(__name__)
 load_dotenv()
@@ -48,8 +50,11 @@ def upload():
                 return jsonify({'Error':'File part not found.'})
             
             #Parse filename and convert to ASCII secure name
-            file = request.files["upload_file"]
             filename = secure_filename(file.filename)
+
+            #Parse file arguments
+            video_format = request.form.get("video_format")
+            
             
             #Join secure filename to path and save
             os.makedirs(UPLOAD_FOLDER, exist_ok=True)
@@ -72,6 +77,7 @@ def display(filename):
     return render_template("display.html",filename=filename)
 
 #Return uploaded video
+#Implemented in <display.html>
 @app.route("/chopped_uploads/<filename>")
 def uploaded_file(filename):
     return send_from_directory(UPLOAD_FOLDER, filename)
