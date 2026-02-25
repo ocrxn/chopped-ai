@@ -3,9 +3,8 @@
   <head>
     <meta charset="utf-8">
     <title>{% block title %}{% endblock %}</title>
-
     <link rel="stylesheet" href="{{ url_for('static', filename='css/template.css') }}">
-    {% block extra_css %}{% endblock %}
+      {% block extra_css %}{% endblock %}
 
   </head>
   <body>
@@ -16,10 +15,15 @@
             <img id="logo" src="{{ url_for('static', filename='images/logo.png') }}" alt="Chopped AI Logo">
           </a>
             <ul class="menu">
-            <li><a href="{{ url_for('home') }}">Home</a></li>
+            {% if session.get("user") %}
             <li><a href="{{ url_for('upload') }}">Upload</a></li>
             <li><a href="{{ url_for('about') }}">About</a></li>
+            <li><a href="{{ url_for('profile') }}">My Profile</a></li>
             <li><a href="{{ url_for('logout') }}">Log Out</a></li>
+            {% else %}
+            <li><a href="{{ url_for('about') }}">About</a></li>
+
+            {% endif %}
           </ul>
         </nav>
 

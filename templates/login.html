@@ -1,13 +1,13 @@
-<!DOCTYPE html>
-<html lang="en" dir="ltr">
-  <head>
-    <meta charset="utf-8">
-    <title>Login</title>
+{% extends "template.html" %}
+{% block title %}
+Login
+{% endblock %}
+      {% block extra_css %}
       <link rel="stylesheet" href="static/css/login.css">
-  </head>
-  <body>
-    {% extends "template.html" %}
-    {% block content %}
+      {% endblock %}
+
+
+{% block content %}
 {% with messages = get_flashed_messages(with_categories=true) %}
   {% if messages %}
     <ul>
@@ -63,8 +63,4 @@
       </div>
     </div>
 
-  
-
     {% endblock %}
-  </body>
-</html>

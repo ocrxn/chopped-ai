@@ -9,3 +9,5 @@ venv/
 /chopped_uploads/
 /chopped_streams/
 git_notes.txt
+.DS_STORE
+sattic/.DS_STORE

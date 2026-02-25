@@ -1,13 +1,15 @@
 import os
-from flask import Flask, render_template, redirect, url_for, session, request, flash, jsonify, send_from_directory
+from flask import Flask, render_template, abort, redirect, url_for, session, request, flash, jsonify, send_from_directory
 from dotenv import load_dotenv
 from db_conn import Connection
 from email_verif import connect_smtp
 from werkzeug.utils import secure_filename
 from config import UPLOAD_FOLDER, OUTPUT_FOLDER
+import signal
 import json
 import subprocess
 from file_handling import FileHandler
+
 
 
 app = Flask(__name__)
@@ -34,6 +36,13 @@ def home():
         return is_logged_out
     return render_template("home.html")
 
+@app.route("/profile", methods=["GET","POST"])
+def profile():
+    is_logged_out = require_login()
+    if is_logged_out:
+        return is_logged_out
+    return render_template("profile.html")
+
 @app.route("/upload", methods=["GET","POST"])
 def upload():
     is_logged_out = require_login()
@@ -50,25 +59,35 @@ def upload():
             if not file or file.filename == "":
                 return jsonify({'Error':'File part not found.'})
             
+
             #Parse filename and arguments
             filename = secure_filename(file.filename)
-            video_format = request.form.get("video_format")
-            output_format = request.form.get("output_format")
-
-            #File Handler
-            fh = FileHandler("filename.mp4","/my_output_dir/",["arg1", "arg2"])
-            compress_video = fh.compress_video()
-            print(compress_video)
-            
-            #Join secure filename to path and save
             os.makedirs(UPLOAD_FOLDER, exist_ok=True)
             os.makedirs(OUTPUT_FOLDER, exist_ok=True)
             path = os.path.join(UPLOAD_FOLDER, filename)
             file.save(path)
+
+            #Store values in dictionary
+            kwargs = {
+                "filename": filename,
+                "path": path,
+                "video_format": request.form.get("video_format"),
+                "audio_format": request.form.get("audio_format"),
+                "output_format": request.form.get("output_format")
+            }
+                       
+            #File Handler (file_handling.py)
+            fh = FileHandler()
+            compress_video = fh.compress_video(kwargs)
+            print(compress_video)
+
             return redirect(url_for("display", filename=filename))
-        #Return error for empty submit
+
         except FileNotFoundError:
             return jsonify({'Error':'No file uploaded.'})
+        except Exception as e:
+            return jsonify({"An exception has occurred":f'{e}'})
+
 
 
 #Return display.html
@@ -118,7 +137,6 @@ def signup():
         username = request.form["username"]
         email = request.form["email"]
         password = request.form["password"]
-        print(f"{username}\n{email}\n{password}")
 
         cn = Connection()
 
@@ -135,8 +153,10 @@ def signup():
             #Set user status active in DB
             cn.update_status("UPDATE public.users SET is_active=TRUE WHERE username=%s",username)
 
-            # #Send 2FA code to user email for verification
-            connect_smtp(username, email)
+        #!!!!Temporarily disabled to prevent backend complications  #TODO
+            #Send 2FA code to user email for verification
+            #See email_verify.py for implementation
+            # connect_smtp(username, email)
             
             return redirect(url_for("home"))
 
@@ -163,6 +183,26 @@ def about():
     if is_logged_out:
         return is_logged_out
     return render_template("about.html")
+
+@app.route("/delete", methods=["POST"])
+def delete():
+    is_logged_out = require_login()
+    if is_logged_out:
+        return is_logged_out
+    return jsonify({"Account deleted":"success","Message":"Your account has been successfully deleted and all data has been erased."})
+
+@app.route("/shutdown", methods=["POST"])
+def shutdown():
+    if session.get("user") != 'admin':
+        abort(403)
+    shutdown_server = request.environ.get('werkzeug.server.shutdown')
+    if shutdown_server is None:
+        print(f"Flask server not using werkzeug. Shutting down using SIGINT...")
+        os.kill(os.getpid(), signal.SIGINT)
+        return jsonify({"SIGINT trigger":"Success","Content":"Flask server shutting down..."})
+    else:
+        shutdown_server()
+        return jsonify({"Werkzeug trigger":"Success","Content":"Flask server shutting down..."})
 
 
 if __name__ == "__main__":

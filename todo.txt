@@ -7,8 +7,6 @@
 
 
 FLASK
---Serve video to user
-
 --Make uploads folder generic (aka. os.makedirs)
 
 --Add internal shutdown signal for flask application
