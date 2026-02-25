@@ -1,0 +1,49 @@
+h1 {
+    color: gold;
+}
+
+.delete-btn {
+    background-color: #c0392b;
+    color: white;
+    padding: 10px 16px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.delete-btn:hover {
+    background-color: #a93226;
+}
+
+.delete {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.delete h3{
+    margin: 0;
+}
+
+.shutdown{
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.shutdown h3 {
+    margin: 0;
+}
+
+.shutdown-btn {
+    background-color: #ff1c03;
+    color: white;
+    padding: 10px 16px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.shutdown-btn:hover {
+    background-color: #a93226;
+}
