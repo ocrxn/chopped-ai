@@ -1,45 +1,80 @@
-import time
+import os
 from audio_extractor import extract_audio
-from speech_recognition import transcribe_audio
+from speech_recognition import transcribe_audio_with_whisper
 from clip_creator import create_clip
-
-# Your video and voiceline
-video_path = "your_video.mp4"
-audio_path = "extracted_audio.wav"
-output_clip_path = "detected_voiceline_clip.mp4"
+from video_upload import convert_to_standard
+from timer import ProgressTracker
 
 # List of phrases to trigger the clip
-trigger_phrases = ["single", "error", "strikeout", "flyout", "walk", "double", "triple", "groundout",  ]
+trigger_phrases = sorted(
+    ["single", "error", "strikeout", "flyout", "walk", "double", "double play", "triple", "groundout"],
+    key=len,
+    reverse=True
+)
+
+
+def find_trigger_segments(segments, trigger_phrases):
+    matches = []
+    for segment in segments:
+        text_lower = segment['text'].lower()
+        for phrase in trigger_phrases:
+            if phrase in text_lower:
+                matches.append((segment['start'], phrase))
+                break
+    return matches
+
 
 def main():
-    # Step 1: Extract audio from video
-    print("Extracting audio from video...")
-    extract_audio(video_path, audio_path)
+    tracker = ProgressTracker()
 
-    # Step 2: Transcribe audio
-    print("Transcribing audio...")
-    transcript = transcribe_audio(audio_path)
-    if transcript:
-        print("Transcript received.")
-        print(transcript)
-    else:
+    # Step 1: Find and convert video to video.mp4
+    print("Searching for video file...")
+    if not convert_to_standard():
+        return
+
+    video_path = "video.mp4"
+    audio_path = "audio.wav"
+    output_clip_path = "detected_voiceline_clip.mp4"
+
+    # Step 2: Extract audio
+    tracker.start_stage("Extracting audio")
+    extract_audio(video_path, audio_path)
+    tracker.finish_stage()
+
+    # Step 3: Transcribe audio
+    tracker.start_stage("Transcribing audio")
+    segments = transcribe_audio_with_whisper(audio_path)
+    tracker.finish_stage()
+
+    if not segments:
         print("No transcription available.")
         return
 
-    # Step 3: Check for trigger phrases
-    transcript_lower = transcript.lower()
-    if any(phrase in transcript_lower for phrase in trigger_phrases):
-        print("Trigger phrase detected!")
+    print(f"Transcription complete. {len(segments)} segments found.")
 
-        # WARNING: Without timestamp info, assume start or add custom detection
-        # For demonstration, assume timestamp at 10 seconds
-        detected_time = 10  # You should replace this with real timestamp detection
-        print(f"Creating clip around {detected_time} seconds...")
-
-        # Step 4: Create 30-second clip around the detected time
-        create_clip(video_path, detected_time, output_clip_path)
-    else:
+    # Step 4: Search for trigger phrases
+    matches = find_trigger_segments(segments, trigger_phrases)
+    if not matches:
         print("No trigger phrases found in transcript.")
+        tracker.finish_all()
+        return
+
+    # Step 5: Create a clip for each trigger
+    for i, (detected_time, phrase) in enumerate(matches):
+        clip_output = f"voiceline{i + 1}.mp4"
+        tracker.start_stage("Creating clip")
+        print(f"Trigger '{phrase}' detected at {detected_time:.2f}s — saving to {clip_output}")
+        create_clip(video_path, detected_time, clip_output)
+        tracker.finish_stage()
+
+    # Step 6: Delete the original video now that we're done with it
+    if os.path.exists(video_path):
+        os.remove(video_path)
+        print(f"Deleted {video_path}")
+
+    tracker.finish_all()
+    print(f"{len(matches)} clip(s) created.")
+
 
 if __name__ == "__main__":
     main()

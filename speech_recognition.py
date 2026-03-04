@@ -23,7 +23,7 @@ def transcribe_audio_with_whisper(audio_path):
 
 
 # Example usage:
-if __name__ == "__chopped_main__":
+if __name__ == "__main__":
     audio_path = "extracted_audio.wav"
     segments = transcribe_audio_with_whisper(audio_path)
     for segment in segments:
