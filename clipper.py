@@ -5,46 +5,19 @@ from __future__ import annotations
 
 import subprocess #lets Python run other programs on computer (FFmpeg)
 from pathlib import Path #necessary for working with folders
+import json
 
-class FFmpegError(RuntimeError):
-    pass
-#create error for if FFmpeg fails
+events_file = Path('/Users/matth/Documents/Innovation-Scholars/baseball-highlights-chopclips/backend/chopped-ai/data.json')
 
-def cut_clip(
-        video_path:str,
-        start_time: float,
-        duration: float,
-        output_path: str,
-) -> Path:
-    
-    # create a Path object and ensure folder exists
-    output_file = Path(output_path)
-    output_file.parent.mkdir(parents=True, exist_ok=True)
-    
-    command = [
-    "ffmpeg",
-    "-y",
-    "-ss", str(start_time),
-    "-i", video_path,
-    "-t", str(duration),
+    # Open JSON file
+if events_file.exists():
+    with open(events_file, 'r') as file:
+    # load JSON data
+        data = json.load(file)
+        print(data)
+else:
+    #print if json file is not open
+        print("JSON file not found")
 
-    # Make output very compatible
-    "-c:v", "libx264",
-    "-pix_fmt", "yuv420p",
-    "-profile:v", "main",
-    "-level", "4.0",
-
-    "-c:a", "aac",
-    "-b:a", "128k",
-    "-ar", "44100",
-
-    "-movflags", "+faststart",
-    output_path,
-]
-
-    try:
-        subprocess.run(command, check=True)
-    except subprocess.CalledProcessError as e:
-        raise FFmpegError("FFmpeg failed to create the clip.") from e
-
-    return output_file
+def clip_video(video_path: str, type: str, time: int, duration: 35):
+     
