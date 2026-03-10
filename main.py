@@ -74,6 +74,7 @@ def upload():
             kwargs = {
                 "filename": filename,
                 "input_path": upload_path,
+                "hardware_encode": request.form.get("hardware_encode"),
                 "output_format": request.form.get("output_format") or "mp4",
                 "output_dir": CMPR_UPLOAD_FOLDER
             }

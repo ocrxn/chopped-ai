@@ -3,11 +3,23 @@
 ## 1. Download python if not already (https://www.python.org/downloads/)
 ### Add to PATH
 ### Install Python Extension in VSCode
-## 2. Clone into master branch
+## 2. Install ffmpeg
+### Windows
+#### Using Chocolatey
+`choco install ffmpeg`
+### Else (https://www.gyan.dev/ffmpeg/builds/)
+#### Download *ffmpeg-release-essentials.zip*, extract, and run .exe
+### MacOS - Requires Homebrew
+`brew install ffmpeg` 
+### Linux
+`sudo apt update`
+
+`sudo apt install ffmpeg`
+## 3. Clone into master branch
 `git clone "https://github.com/ocrxn/chopped-ai"`
 
 `cd ./chopped-ai`
-## 3. VENV
+## 4. VENV
 `python3 -m venv venv`
 ### Verify python is installed in venv
 `which python`
@@ -17,20 +29,20 @@
 `source venv/bin/activate`
 ### For Windows
 `./venv/Scripts/Activate`
-## 4. ENV FILE
+## 5. ENV FILE
 ### Create .env file
 ### Paste contents shared on Teams Chat into .env file 
-## 5. Install required dependencies
+## 6. Install required dependencies
 ### if inside venv
 `pip install -r requirements.txt`
 ### if that doesn't work
 `python3 -m pip install -r requirements.txt`
 ### if pip install breaks, install packages manually
 `python3 -m pip install <package>`
-## 6. Run main.py
+## 7. Run main.py
 `python3 main.py`
 ### If venv source interrupts, run again
-## 7. Website on port 5050 
+## 8. Website on port 5050 
 ### [http://127.0.0.1:5050/](http://127.0.0.1:5050/)
 
 
