@@ -1,13 +1,46 @@
 {% extends "template.html" %}
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/profile.css') }}">
+{% endblock %}
+
 {% block content %}
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    <ul>
+      {% for category, message in messages %}
+        <li class="{{ category }}">{{ message }}</li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+{% endwith %}
+
   <h1>Profile</h1>
   <h2>Username:  {{ session.get("user") }} </h2>
 
   <h1>Settings</h1>
-  <div class="delete">
-    <button type="button" class="delete-btn">Delete Profile</button>
-    <h3>WARNING: This action is PERMANENT!</h3>
+
+  <!--Delete Account Form-->
+  <input type="checkbox" id="confirm-toggle" hidden>
+  <label for="confirm-toggle" class="delete-btn">Delete</label>
+  <div class="modal">
+    <div class="modal-box">
+      <h3>Delete your account?</h3>
+
+      <form action="{{ url_for('delete') }}" method="POST">
+        <p>Enter username:</p>
+        <input type="text" name="del-username" required>
+        <p>Enter password:</p>
+        <input type="password" name="del-password" required>
+
+        <div class="buttons">
+          <label for="confirm-toggle" class="cancel-btn">Cancel</label>
+          <button id="confirm-delete" type="submit">DELETE ACCOUNT</button>
+        </div> 
+      </form>
+    </div>
   </div>
+
+  <!--Shutdown flask server-->
   {% if session.get("user") == 'admin' %}
     <div class="shutdown">
       <h2>⚠️Admin Panel⚠️</h2>

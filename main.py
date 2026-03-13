@@ -153,7 +153,6 @@ def signup():
         
         #Create new user in DB if not exists
         if cn.create_user(username, email, password):
-            #Store user in session
             session["user"] = username
 
             #Set user status active in DB
@@ -171,7 +170,6 @@ def signup():
 def logout():
     username = session.get("user")
     if username:
-        #Remove user from session
         session.pop("user", None)
 
         #Set user status not active in DB
@@ -192,7 +190,28 @@ def delete():
     is_logged_out = require_login()
     if is_logged_out:
         return is_logged_out
-    return jsonify({"Account deleted":"success","Message":"Your account has been successfully deleted and all data has been erased."})
+    
+    if request.method == "POST":
+        del_username = request.form["del-username"]
+        del_password = request.form["del-password"]
+
+        if del_username != session.get("user"):
+            flash("Username does not match current user.")
+            return redirect(url_for("profile"))
+
+        cn = Connection()
+        if cn.confirm_user(del_username, del_password):
+            delete = cn.delete_user(del_username)
+            if delete:
+                flash("Account successfully deleted")
+                return redirect(url_for("login"))
+            else:
+                return jsonify({"Database Error":"Account failed to delete. Please try again."})
+        flash("Incorrect password")
+        return redirect(url_for("profile"))
+    
+    return jsonify({"Error Occurred":"Method /delete has failed"})
+
 
 @app.route("/shutdown", methods=["POST"])
 def shutdown():
@@ -210,4 +229,3 @@ def shutdown():
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5050, debug=False)
-

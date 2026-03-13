@@ -72,6 +72,24 @@ class Connection:
             exe.close()
             conn.close()
     
+    def delete_user(self, username):
+        try:
+            conn = self.connect_db()
+            exe = conn.cursor()
+            exe.execute("DELETE FROM users WHERE username=%s", (username,))
+            conn.commit()
+            if exe.rowcount > 0:
+                return True
+            return False
+
+        except psycopg2.Error as error:
+            print("An error has occurred: {error}")
+        except Exception as e:
+            print(f"Confirm User Exception has occurred: {e}")
+        finally:
+            exe.close()
+            conn.close()
+    
     def query_db(self, query):
         try:
             conn = self.connect_db()
