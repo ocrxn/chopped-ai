@@ -18,3 +18,4 @@ static/.DS_STORE
 /clips/
 /uploads-backup/
 /__pycache__/clipper.cpython-314.pyc/
+data.json
