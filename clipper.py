@@ -6,20 +6,18 @@ from __future__ import annotations
 import subprocess #lets Python run other programs on computer (FFmpeg)
 from pathlib import Path #necessary for working with file paths
 import json
-from processor import load_events
+import os
 
 
 
 def clip_video(video_path: str, output_path: str, start_time: int, duration: int = 35):
     
-    json_file = Path("data.json")
-    load_events(json_file)
 
 
     command = [
         "ffmpeg",
-        "-i", video_path, #input video file
         "-ss", str(start_time), #start cutting at start time
+        "-i", video_path, #input video file
         "-t", str(duration), #duration of the cut
         "-c", "copy", #copies audio and video streams without re-encoding
                       #makes process faster
@@ -27,6 +25,7 @@ def clip_video(video_path: str, output_path: str, start_time: int, duration: int
     ]
 
     subprocess.run(command, check=True)
+    os.remove(video_path)
     
 
 #takes in video file path
