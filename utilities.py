@@ -6,7 +6,6 @@ import whisper
 
 SUPPORTED_FORMATS = [".mp4", ".mov", ".avi", ".mkv"]
 
-
 # Video Converter
 
 def find_and_convert_video(output_filename="video.mp4"):
@@ -62,23 +61,6 @@ def transcribe_audio(audio_path):
     model = whisper.load_model("base")
     result = model.transcribe(audio_path)
     return result['segments']
-
-
-# Clip Creator
-
-def create_clip(video_path, start_time, output_path, clip_duration=30):
-    try:
-        clip_end = start_time
-        clip_start = max(0, clip_end - clip_duration)
-        video = VideoFileClip(video_path)
-        subclip = video.subclip(clip_start, clip_end)
-        subclip.write_videofile(output_path, codec="libx264")
-        subclip.close()
-        video.close()
-        print(f"Clip saved to {output_path}")
-    except Exception as e:
-        print(f"An error occurred while creating the clip: {e}")
-
 
 # Progress Tracker
 
