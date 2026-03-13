@@ -1,0 +1,54 @@
+{% extends "template.html" %}
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/upload.css') }}">
+{% endblock %}
+
+
+{% block content %}
+
+  <h1> Upload your Video (and Audio) Files </h1>
+  <br>
+  <h2>Max File Size: 1 MB</h2>
+
+  <form method="POST" action="{{ url_for('upload') }}" enctype="multipart/form-data">
+    <div id="form_div">
+
+      <div id="upload_div">
+          <p> Acceptable VIDEO FORMATS: .mp4, .mov, .webm, .mkv</p>
+        <input type="file" name="upload_file" accept=".mp4,.mov,.webm,.mkv" placeholder="Upload video file">
+          <p> Acceptable AUDIO FORMATS: .mp3, .wav, .m4a</p>
+        <input type="file" name="upload_file" accept=".mp3,.wav,.m4a" placeholder="Upload audio file if separate">
+
+        <input id="upload_button" type="submit" value="upload">
+      </div>
+
+          
+          <div id="args_div">
+            <h2>Select formatting/ffmpeg arguments</h2>
+            <h4>Enable hardware encoding: fast, but larger file</h3>
+            <h4>Leave unchecked for CPU encoding: slower, but smaller file</h4>
+            <input type="checkbox" name="hardware_encode">
+            <label>ENABLE Hardware Encoding</label><br>
+
+            <h3>Video Format</h3>
+            <input type="radio" name="output_format" value="mp4">
+              <label>MP4</label><br>
+            
+            <input type="radio" name="output_format" value="mov">
+              <label>MOV</label><br>
+
+            <input type="radio" name="output_format" value="webm">
+              <label>WebM</label><br>
+            
+            <input type="radio" name="output_format" value="mkv">
+              <label>MKV</label><br>
+
+            <h3>Includes Audio?</h3>
+            <input type="checkbox" name="audio_include" value="audio_include_box">
+              <label>Yes</label>
+
+          </div>
+        </div>
+  </form>
+
+{% endblock %}

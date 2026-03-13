@@ -1,0 +1,64 @@
+def create_db(self):
+        try:
+            conn = self.connect_db()
+            exe = conn.cursor()
+
+            create_query = """CREATE TABLE IF NOT EXISTS users (
+                id SERIAL PRIMARY KEY,      -- auto-incrementing integer
+                name VARCHAR(100) NOT NULL, -- text column
+                age INT,                     -- integer column
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP);"""
+            exe.execute(create_query)
+            conn.commit()
+        except psycopg2.Error as error:
+            print("An error has occurred.")
+        except Exception as e:
+            print(f"Exception has occurred: {e}")
+        finally:
+            exe.close()
+            conn.close()
+
+
+-----RECREATE THE ENTIRE TABLE
+CREATE TABLE IF NOT EXISTS public.users
+(
+    id SERIAL PRIMARY KEY,
+    username VARCHAR(100) NOT NULL,
+    is_admin BOOLEAN NOT NULL DEFAULT FALSE,
+    is_active BOOLEAN NOT NULL DEFAULT FALSE,
+    password BYTEA NOT NULL,
+    email VARCHAR(255) NOT NULL UNIQUE,
+    email_verified BOOLEAN NOT NULL DEFAULT FALSE,
+    email_token CHAR(6),
+    created_at TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+
+-----INSERT TEST VALUES INTO TABLE-----
+INSERT INTO public.users
+(
+    username,
+    is_admin,
+    password,
+    email,
+    email_verified,
+    email_token
+)
+VALUES
+(
+    'test_user_1',
+    FALSE,
+    gen_random_bytes(32),
+    'test_user_1@example.com',
+    FALSE,
+    '123456'
+);
+
+-----ADD COLUMN TO TABLE-----
+ALTER TABLE public.users
+ADD COLUMN is_active BOOLEAN NOT NULL DEFAULT false
+
+
+
+-----TRUNCATE AND RESTART IDENTITY-----
+TRUNCATE TABLE public.users RESTART IDENTITY CASCADE;
