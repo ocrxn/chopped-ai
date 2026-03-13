@@ -1,7 +1,3 @@
-<<<<<<< HEAD
-#receives file paths
-#calls processing function
-=======
 import os
 from flask import Flask, render_template, abort, send_file,redirect, url_for, session, request, flash, jsonify, send_from_directory
 from dotenv import load_dotenv
