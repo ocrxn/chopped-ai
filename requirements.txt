@@ -6,7 +6,6 @@ filelock==3.24.3
 Flask==3.1.2
 HTMLParser==0.0.2
 httpsproxy_urllib2==1.0
-import-java==0.6
 keyring==25.7.0
 moviepy==2.2.1
 openai-whisper==20250625

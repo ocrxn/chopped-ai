@@ -1,16 +1,78 @@
 <!DOCTYPE html>
 <html lang="en" dir="ltr">
   <head>
-    <meta charset="utf-8">
-    <title>About Chopped AI</title>
+    <meta charset="utf-8">    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chopped.ai</title>
+    <link rel="stylesheet" href="static/css/template.css">
+
   </head>
   <body>
     {% extends "template.html" %}
     {% block content %}
+    <!--Intro Section-->
+<div class="main">  
+    <div class="main__container">
+        <div class="main__content">
+        <h1>Welcome to Chopped.ai</h1>
+        <h2>Unleash the Power of your team</h2>
+        <p>Your one-stop solution for all your repaly needs. Explore our cutting-edge tools and services designed to empower your creativity and productivity.</p>
+        <button class="main__btn"><a href="signup">Get Started</a></button>
+     </div>
+        <div class="main__image">
+            <img src="static\images\pic1.svg" alt="Main Image" id="main__img">
+        </div>
+    </div>
+</div>  
 
-    <h1> About Chopped AI </h1>
-    <p></p>
-<br>
-      {% endblock %}
+<!-- Services section --> 
+<div class="services"> 
+    <h1>See What the Hype is About</h1>
+    <div class="services__container">
+        <div class="services__card">
+            <h2>Voice recognition clip capturing</h2>
+            <p>Automatically cut up games, and get to the important clips in no time</p>
+            <button><a href="signup">Get Started</a></button>
+        </div>
+        <div class="services__card">
+            <h2>Easy to use interface</h2>
+            <p>Our intuitive interface makes it simple to navigate and use all of our features without any technical knowledge.</p>
+            <button><a href="signup">Get Started</a></button>
+        </div>
+    </div>
+</div>
+
+<!-- Footer Section --> 
+
+<div class="footer__container">
+    <div class="footer__links">
+        <div class="footer__link--wrapper">
+            <div class="footer__link--items">
+                <h2>About Us</h2>
+                <a href="howwork">How It Works</a>
+                <a href="/">Testimonials</a>
+                <a href="/">Careers</a>
+                <a href="/">Investors</a>
+                <a href="/">Terms of Service</a>
+            </div>
+            <div class="footer__link--items">
+                <h2>Contact Us</h2>
+                <a href="/">Contact</a>
+                <a href="/">Support</a>
+                <a href="/">Destinations</a>
+                <a href="/">Sponsorships</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- copyright section -->
+<div class="footer__container">
+     <a href="/" id="footer__logo"><i class="fas fa-gem"> </i>Chopped.ai</a>
+     <p class="website__rights">Chopped.ai © 2026</p> 
+</div>
+      {% endblock %} 
   </body>
 </html>
+
+ 
