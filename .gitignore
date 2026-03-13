@@ -8,7 +8,7 @@ venv/
 .venv
 git_notes.txt
 .DS_STORE
-sattic/.DS_STORE
+static/.DS_STORE
 
 /chopped_uploads/
 /compressed_uploads/
