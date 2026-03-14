@@ -48,7 +48,7 @@ def process_video(video_path, events_file, clips_dir="clips"):
           event_type = event["type"]
           label = event["label"]
           time = event["timestamp"]
-          
+          # if type == hit or error then it goes to a different folder
           output_path = os.path.abspath(os.path.join(clips_dir, f"{i + 1}_{label}.mp4"))
           clip_video(
             video_path=video_path, 
@@ -64,7 +64,7 @@ events_path = os.path.join(BASE_DIR, "data.json")
 process_video(video_path, events_path)
 print("ts should work I hope")
 
-# os.remove(video_path)
+os.remove(video_path)
     
     
     # video_path locates the video file
