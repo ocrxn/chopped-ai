@@ -7,6 +7,7 @@ import json
 import os
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+#gets  absolute path of  current Python file and returns directory it’s located in
 
 #function to load events from .json file
 def load_events(events_file):
@@ -30,6 +31,26 @@ def load_events(events_file):
         raise Exception("Events JSON must be a list")
     
     return data
+
+def matching_video(events_file, uploads_dir="uploads"):
+    events_file=Path(events_file)
+    uploads_dir = BASE_DIR / uploads_dir #combines base directory with uploads directory to create full path to uploads directory
+
+    json_stem = events_file.stem # ex: takes game_0001 from game_0001.json
+
+    possible_extensions = [".mp4", ".mov"] #for now the two video extension types
+
+    for ext in possible_extensions:
+         video_path = uploads_dir / f"{json_stem}{ext}"
+         if video_path.exists():
+              return video_path
+    #for loop to iterate through uploads directory to see if a video matches the json file name
+    #if it does, it returns that video type
+    #if not, it throws an error
+    
+    raise FileNotFoundError(
+         f"No matching video for {events_file.name} in {uploads_dir}"
+    )
      
 
 def process_video(video_path, events_file, clips_dir="clips"):
