@@ -26,7 +26,6 @@ def clip_video(video_path: str, output_path: str, start_time: int, duration: int
 
 
     subprocess.run(command, check=True)
-    
 
 #takes in video file path
 #takes in data from JSON file from processor.py
