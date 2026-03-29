@@ -22,6 +22,5 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 #Uploads & output
 UPLOAD_FOLDER = os.path.join(BASE_DIR, os.getenv('upload_folder'))
-CMPR_UPLOAD_FOLDER = os.path.join(BASE_DIR, os.getenv('cmpr_upload_folder'))
 OUTPUT_FOLDER = os.path.join(BASE_DIR, os.getenv('output_folder'))
 

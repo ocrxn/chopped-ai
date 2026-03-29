@@ -3,6 +3,7 @@ import sys
 import subprocess
 import time
 from datetime import datetime
+import shutil
 
 
 class FileHandler():
@@ -26,98 +27,113 @@ class FileHandler():
         except Exception:
             return None
 
+
     def compress_video(self, kwargs):
-        filename = kwargs.get("filename")
-        video_input_path = kwargs.get("video_input_path")
-        audio_input_path = kwargs.get("audio_input_path") or None
-        vid_ext = kwargs.get("vid_ext") or "mp4"
+        filename = kwargs.get("vid_filename")
+        video_path = kwargs.get("video_path")
+        vid_ext = kwargs.get("vid_ext")
         output_dir = kwargs.get("output_dir")
 
-        if not filename or not video_input_path:
+        if not filename or not video_path:
             return
         
         os.makedirs(output_dir, exist_ok=True)
-        name, _ = os.path.splitext(filename)
-        output_path = os.path.join(output_dir, f"cmpr_{name}.{vid_ext}")
+        output_path = os.path.join(output_dir, filename)
 
-        use_hardware_encoding = bool(kwargs.get("hardware_encode"))
+        encoding_mode = kwargs.get("encoding")
         hw_encoder = self.detect_hardware_encoder()
 
-        video_codec_map = {
+
+        cpu_codecs = {
             "mp4": "libx264",
             "mkv": "libx265",
             "webm": "libvpx-vp9",
             "mov": "libx264"
         }
-        audio_codec_map = {
-            "mp4": "aac",
-            "mkv": "aac",
-            "webm": "libopus",
-            "mov": "aac"
+
+        hw_codecs = {
+            "mp4": hw_encoder,
+            "mkv": hw_encoder,
+            "webm": "libvpx-vp9",
+            "mov": hw_encoder
         }
 
-        video_codec = video_codec_map.get(vid_ext, "libx264")
-        audio_codec = audio_codec_map.get(vid_ext, "aac")
-
         #If available and enabled, swap to hardware encoding for accelerated processing
-        if use_hardware_encoding and hw_encoder:
-            video_codec = hw_encoder
-        
-        original_size = os.path.getsize(video_input_path)
-        start_time = time.perf_counter()
-
+        if encoding_mode == "gpu" and hw_encoder:
+            video_codec = hw_codecs.get(vid_ext, hw_encoder)
+        else:
+            video_codec = cpu_codecs.get(vid_ext, "libx264")
+                        
         #Initial ffmpeg args
-        cmd = [
-            "ffmpeg",
-            "-i", video_input_path,
-            "-vf", "scale='min(1280,iw)':-2",
-            "-c:v", video_codec
-        ]
+        cmd = ["ffmpeg","-y", "-i", video_path]
+        cmd += ["-vf", "scale=1280:-2:force_original_aspect_ratio=decrease", "-c:v", video_codec]
 
-        #Customized video arguments determined by hardware encoding
-        #Normal CPU codec
-        if video_codec in ["libx264", "libx265"]:
-            cmd += ["-crf", "28", "-preset", "slow"]
-        #Hardware encoding
+        if video_codec == "libvpx-vp9":
+            cmd += ["-crf", "35", 
+                        "-b:v", "0", 
+                        "-deadline", "realtime", 
+                        "-cpu-used", "4"]        
+        elif video_codec in ["libx264", "libx265"]:
+            cmd += ["-crf", "28", "-preset", "faster"]
         else:
-            cmd += ["-b:v", "4M"]
+            cmd += ["-b:v", "4M", "-maxrate", "6M", "-bufsize", "12M"]
+    
+        audio_codec = "libopus" if vid_ext == "webm" else "aac"
+        cmd += ["-c:a", audio_codec, "-b:a", "128k"]
+        cmd.append(output_path)
 
-        #Ending part of ffmpeg args
-        cmd += ["-c:a", audio_codec,
-            "-b:a", "64k",
-            output_path]
+        try:
+            #Run the ffmpeg command and time the results
+            original_size = os.path.getsize(video_path)
+            start_time = time.perf_counter()
 
-        result = subprocess.run(cmd, capture_output=True, text=True)
-        
-        end_time = time.perf_counter()
-        elapsed = end_time - start_time
+            if os.path.exists(output_path):
+                os.remove(output_path)
+            subprocess.run(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.PIPE, text=True, check=True)
+            
+            end_time = time.perf_counter()
+            elapsed = end_time - start_time
 
-        # Get compressed file size
-        if os.path.exists(output_path):
-            compressed_size = os.path.getsize(output_path)
-            ratio = original_size / compressed_size
-        else:
+            # Get compressed file size
             compressed_size = 0
-            ratio = 0
+            ratio = 0.0
+            status = "success"
 
-        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            if os.path.exists(output_path):
+                compressed_size = os.path.getsize(output_path)
+                ratio = original_size / compressed_size
+            
+            #Revert to original video if new video is larger
+            if compressed_size > original_size:
+                os.remove(output_path)
+                shutil.copy(video_path,output_path)
+                compressed_size = original_size
+                status = "Compression Failed: Kept Original"
 
-        log_text = (
-        f"[{timestamp}] File: {filename}\n"
-        f"Hardware encoding enabled: {use_hardware_encoding}\n"
-        f"Hardware Encoder: {hw_encoder}\n"
-        f"Video Codec: {video_codec}\n"
-        f"Original size: {original_size / 1024:.2f} KB\n"
-        f"Compressed size: {compressed_size / 1024:.2f} KB\n"
-        f"Compression ratio: {ratio:.2f}x smaller\n"
-        f"Time taken: {elapsed:.2f} seconds or ~{(elapsed/60):.1f} minutes\n"
-        "----------------------------------------\n"
-    )
-        log_file_path = os.path.join(output_dir, "compression_log.txt")
-        with open(log_file_path, "a") as f:
-            f.write(log_text)
+            timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
-        return result
+            log_text = (
+            f"[{timestamp}] File: {filename}\n"
+            f"Encoding type: {encoding_mode}\n"
+            f"Hardware Encoder: {hw_encoder}\n"
+            f"Video Codec: {video_codec}\n"
+            f"Original size: {original_size / 1024:.2f} KB\n"
+            f"Compressed size: {compressed_size / 1024:.2f} KB\n"
+            f"Compression ratio: {ratio:.2f}x smaller\n"
+            f"Time taken: {elapsed:.2f} seconds or ~{(elapsed/60):.1f} minutes\n"
+            f"Status: {status}\n"
+            "----------------------------------------\n"
+        )
+            log_file_path = os.path.join(output_dir, "compression_log.txt")
+            with open(log_file_path, "a") as f:
+                f.write(log_text)
+            return {"status": "success", "cmpr_size": compressed_size}
         
-    def compress_audio(self):
-        pass
+        except subprocess.CalledProcessError as e:
+            print(f"--- FFMPEG LOG START ---")
+            print(e.stderr) 
+            print(f"--- FFMPEG LOG END ---")
+            log_file_path = os.path.join(output_dir, "compression_log.txt")
+            with open(log_file_path, "a") as f:
+                f.write(f"[{datetime.now()}] ERROR on {filename}: {e.stderr}\n")
+            return {"status": "error", "message": e}

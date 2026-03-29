@@ -1,15 +1,26 @@
 {% extends "template.html" %}
 {% block content %}
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    <ul>
+      {% for category, message in messages %}
+        <li class="{{ category }}">{{ message }}</li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+{% endwith %}
 
 <h1> Video </h1>
 <br>
 <video width="560px" height="420px" controls>
-  <source src="{{ url_for('cmpr_uploads', filename=filename) }}">
+  <source src="{{ url_for('get_video', filename=filename) }}">
   Your browser does not support the video tag.
 </video>
 <br>
-<a href="{{ url_for('cmpr_uploads', filename=filename) }}" download>
-  Download Compressed Video
+<a href="{{ url_for('get_video', filename=filename) }}" download>
+  Download Video 
 </a>
+<h3>[Compression Mode: {{ cmpr_mode or 'None' }}]</h3>
+<h3>[File Size: {{ cmpr_size or 'Original'}}] MB</h3>
 
 {% endblock %}

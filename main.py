@@ -1,18 +1,19 @@
-import os
 from flask import Flask, render_template, abort, send_file,redirect, url_for, session, request, flash, jsonify, send_from_directory
 from dotenv import load_dotenv
-from db_conn import Connection
 from email_verif import connect_smtp
 from werkzeug.utils import secure_filename
-from config import UPLOAD_FOLDER, CMPR_UPLOAD_FOLDER, OUTPUT_FOLDER
+import os
 import signal
 import json
 import subprocess
-from file_handling import FileHandler
 import time
 import datetime
+import tempfile
+import shutil
 
-
+from db_conn import Connection
+from config import UPLOAD_FOLDER, OUTPUT_FOLDER
+from file_handling import FileHandler
 
 app = Flask(__name__)
 load_dotenv()
@@ -20,7 +21,6 @@ app.secret_key = os.getenv('app_key')
 
 #Upload file parameters
 app.config['MAX_CONTENT_LENGTH'] = 1024*1024 * 1024 * 15 #15 GB
-
 
 @app.errorhandler(413)
 def max_file_size_exceeded(e):
@@ -60,84 +60,100 @@ def upload():
 
     if request.method == "POST":
         try:
+            #Get video/audio files from website and return if empty
             video_file = request.files.get('video_upload_file')
             audio_file = request.files.get('audio_upload_file')
             if not video_file or video_file.filename == "":
                 return jsonify({'Error': 'File part not found.'})
 
-            # Parse filename
+            #Create secure filenames, extract exts, and make paths
             video_filename = secure_filename(video_file.filename)
             video_extension = os.path.splitext(video_filename)[1].lower().replace(".", "")
             video_upload_path = os.path.join(UPLOAD_FOLDER, video_filename)
+
+            audio_filename = secure_filename(audio_file.filename) if audio_file else None
+            audio_extension = os.path.splitext(audio_filename)[1].lower().replace(".", "") if audio_file else None
+            audio_upload_path = os.path.join(UPLOAD_FOLDER, audio_filename) if audio_file else None
+
+            #Get the type of compression encoding user selected
+            encoding = request.form.get("hardware_encode")
+
+            #Create a temporary file where video gets written
+            with tempfile.NamedTemporaryFile(suffix=f".{video_extension}", delete=False) as temp_vid:
+                temp_vid_path = temp_vid.name
+                video_file.save(temp_vid_path)
+                temp_vid.flush()
             
-            chunk_size = 1024 * 1024
-            with open(video_upload_path, "wb") as f:
-                while True:
-                    chunk = video_file.stream.read(chunk_size)
-                    if not chunk:
-                        break
-                    f.write(chunk)
-
-            #Handle audio if included
+            temp_audio_path = None
             if audio_file:
-                audio_filename = secure_filename(audio_file.filename)
-                audio_extension = os.path.splitext(video_filename)[1].lower().replace(".", "")
-                audio_upload_path = os.path.join(UPLOAD_FOLDER, audio_filename)
-
-                with open(audio_upload_path, "wb") as f:
-                    while True:
-                        chunk = audio_file.stream.read(chunk_size)
-                        if not chunk:
-                            break
-                        f.write(chunk)
-
-            kwargs = {
-                "filename": video_filename,
-                "video_input_path": video_upload_path,
-                "audio_input_path": audio_upload_path if audio_file else None,
-                "hardware_encode": request.form.get("hardware_encode"),
-                "vid_ext": video_extension,
-                "audio_ext": audio_extension,
-                "output_dir": CMPR_UPLOAD_FOLDER
-            }
-
-            # Compress the video if user selected a compression mode
-            if kwargs.get("hardware_encode") != "none":
+                with tempfile.NamedTemporaryFile(suffix=f".{audio_extension}", delete=False) as temp_audio:
+                    temp_audio_path = temp_audio.name
+                    audio_file.save(temp_audio_path)
+                    temp_audio.flush()
+      
+            try:
                 fh = FileHandler()
-                result = fh.compress_video(kwargs)
+                kwargs = {
+                        "vid_filename": video_filename,
+                        "audio_filename": audio_filename,
+                        "video_path": temp_vid_path,
+                        "audio_path": temp_audio_path,
+                        "encoding": encoding,
+                        "vid_ext": video_extension,
+                        "audio_ext": audio_extension,
+                        "output_dir": UPLOAD_FOLDER
+                    }
+                
+                #Copy audio file
+                if audio_file:
+                    shutil.move(temp_audio_path,audio_upload_path)
+                
+                result = {"status": "skipped", "cmpr_size": os.path.getsize(temp_vid_path)}
+                #Copy video file
+                if encoding and encoding != "none":
+                    # Compress the video if user selected a compression mode
+                    result = fh.compress_video(kwargs)
+                    print(result)
 
-                #Dump result to file
-                with open("dumps.txt") as file:
-                    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-                    file.write(f"{timestamp}\n-------------------------")
-                    for i,line in enumerate(result):
-                        file.write(f"{i}. {line}")
-                    file.write("-------------------------")
+                else:
+                    # Skip compression and move video from temp to uploads
+                    shutil.move(temp_vid_path,video_upload_path) 
+                
+                cmpr_size = result.get("cmpr_size")
 
-            # Compressed file name (matches compress_video output)
-            name, _ = os.path.splitext(video_filename)
-            compressed_filename = f"cmpr_{name}.{kwargs['output_format']}"
-
-            return redirect(url_for("display", filename=compressed_filename))
+            except Exception as e:
+                flash(f"An error has occurred: {e}")
+                return redirect(url_for('upload'))
+            finally:
+                if temp_vid_path and os.path.exists(temp_vid_path):
+                    os.remove(temp_vid_path)
+                if temp_audio_path and os.path.exists(temp_audio_path):
+                    os.remove(temp_audio_path)
+            return redirect(url_for("display", filename=video_filename, cmpr_mode=encoding, cmpr_size=cmpr_size))
 
         except FileNotFoundError:
-            return jsonify({'Error': 'No file uploaded.'})
+            flash("Error: No file uploaded")
+            return redirect(url_for('upload'))
+        
         except Exception as e:
-            return jsonify({"An exception has occurred": f'{e}'})
-
+            flash(f"Exception has occurred: {e}")
+            return redirect(url_for('upload'))
 
 @app.route("/display/<filename>")
 def display(filename):
     is_logged_out = require_login()
     if is_logged_out:
         return is_logged_out
+    cmpr_mode = request.args.get("cmpr_mode")
+    cmpr_size_long = int(request.args.get("cmpr_size")) / (1024 * 1024)
+    cmpr_size = "{:.2f}".format(cmpr_size_long)
 
-    return render_template("display.html", filename=filename)
+    return render_template("display.html", filename=filename, cmpr_mode=cmpr_mode, cmpr_size=cmpr_size)
 
 
-@app.route("/cmpr_uploads/<filename>")
-def cmpr_uploads(filename):
-    path = os.path.join(CMPR_UPLOAD_FOLDER, filename)
+@app.route("/get_video/<filename>")
+def get_video(filename):
+    path = os.path.join(UPLOAD_FOLDER, filename)
     if not os.path.exists(path):
         return "File not found", 404
 
