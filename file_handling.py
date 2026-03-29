@@ -4,13 +4,20 @@ import subprocess
 import time
 from datetime import datetime
 import shutil
+import zipfile
+
 
 
 class FileHandler():
-    def __init__(self):
-        pass
-
     def detect_hardware_encoder(self):
+        """
+        Calls ffmpeg to detect the encoders installed on the 
+        operating system. 
+
+        h264_videotoolbox: Apple Silicon encoder
+        h264_nvenv: Nvidia encoder
+        h264_qsv: Intel encoder
+        """
         try:
             result = subprocess.run(["ffmpeg", "-encoders"], 
                                     capture_output=True, text=True)
@@ -29,6 +36,15 @@ class FileHandler():
 
 
     def compress_video(self, kwargs):
+        """
+        Takes the video from the user and compresses it
+        Uses the CPU or the GPU depending on what user selected
+        cpu: generally slower, but more effective
+        gpu: generally faster, but less effective
+
+        If compress_video cannot shrink the file (video was already max compressed),
+            then it will delete the new file and stick with the original file uploaded
+        """
         filename = kwargs.get("vid_filename")
         video_path = kwargs.get("video_path")
         vid_ext = kwargs.get("vid_ext")
@@ -137,3 +153,15 @@ class FileHandler():
             with open(log_file_path, "a") as f:
                 f.write(f"[{datetime.now()}] ERROR on {filename}: {e.stderr}\n")
             return {"status": "error", "message": e}
+        
+    def zip_clips(self, clips_dir, zip_dir):
+        """
+        Takes the directory of clips created and returns them as a zip file
+        """
+        if not os.path.exists(zip_dir):
+            os.mkdir(zip_dir)
+
+        zip_path = os.path.join(zip_dir, "")
+
+        with zipfile.ZipFile(zip_dir, 'w', zipfile.ZIP_DEFLATED) as fzip:
+            pass

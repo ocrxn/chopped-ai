@@ -12,7 +12,7 @@ import tempfile
 import shutil
 
 from db_conn import Connection
-from config import UPLOAD_FOLDER, OUTPUT_FOLDER
+from config import UPLOAD_FOLDER, CLIPS_FOLDER, ZIP_FOLDER
 from file_handling import FileHandler
 
 app = Flask(__name__)
@@ -120,6 +120,10 @@ def upload():
                     shutil.move(temp_vid_path,video_upload_path) 
                 
                 cmpr_size = result.get("cmpr_size")
+
+                #Zip the files
+                fh.zip_clips(clips_dir=CLIPS_FOLDER,zip_dir=ZIP_FOLDER)
+
 
             except Exception as e:
                 flash(f"An error has occurred: {e}")
