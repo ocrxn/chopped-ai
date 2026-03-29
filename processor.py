@@ -65,65 +65,37 @@ def process_video(events_file, clips_dir = "clips"):
      events = load_events(events_file)
      #pass in data from json file
      
+     folder_map = {
+               #key -> value; dictionary to compare Python file to
+               "hit": "hits",
+               "out": "outs",
+               "error": "errors",
+               "bunt": "bunts",
+               "pickoff": "pickoffs"
+          }
+     
      for i, event in enumerate(events):
-          #loops through event in events but also keeps track of index i
+        #loops through event in events but also keeps track of index i
                     
-          event_type = event["type"]
-          label = event["label"]
-          time = event["timestamp"]
-          num = random.randint(1000, 9999)
+        event_type = event["type"]
+        label = event["label"]
+        time = event["timestamp"]
+        num = random.randint(1000, 9999)
 
-          # if type == hit or error then it creates a different folder
-          if event_type == "hit":
-            new_clips_dir = clips_dir / "hits"
-            os.makedirs(new_clips_dir, exist_ok=True) #exist_ok=True prevents raising an error if target directory already exists
-            output_path = new_clips_dir / f"{label}_{i+num}{video_path.suffix}"
-            clip_video(
-                video_path=video_path, 
-                start_time= max(0, time - 8), 
-                duration=20, 
-                output_path=output_path
-                )
-          elif event_type == "outs":
-            new_clips_dir = clips_dir / "outs"
-            os.makedirs(new_clips_dir, exist_ok=True)
-            output_path = new_clips_dir / f"{label}_{i+num}{video_path.suffix}"
-            clip_video(
-                video_path=video_path, 
-                start_time= max(0, time - 8),
-                duration=20, 
-                output_path=output_path
-                )
-          elif event_type == "error":
-            new_clips_dir = clips_dir / "errors"
-            os.makedirs(new_clips_dir, exist_ok=True)
-            output_path = new_clips_dir / f"{label}_{i+1}{video_path.suffix}"
-            clip_video(
-                video_path=video_path, 
-                start_time= max(0, time - 8),
-                duration=20,
-                output_path=output_path
-                )
-          elif event_type == "bunt":
-            new_clips_dir = clips_dir / "bunt"
-            os.makedirs(new_clips_dir, exist_ok=True)
-            output_path = new_clips_dir / f"{label}_{i+1}{video_path.suffix}"
-            clip_video(
-                video_path=video_path, 
-                start_time= max(0, time - 8),
-                duration=20,
-                output_path=output_path
-                )
-          if event_type == "pickoffs":
-            new_clips_dir = clips_dir / "pickoffs"
-            os.makedirs(new_clips_dir, exist_ok=True) #exist_ok=True prevents raising an error if target directory already exists
-            output_path = new_clips_dir / f"{label}_{i+1}{video_path.suffix}"
-            clip_video(
-                video_path=video_path, 
-                start_time= max(0, time - 8), 
-                duration=20, 
-                output_path=output_path
-                )
+        folder_name = folder_map[event_type]
+        #folder_map(event_type) means event type "hit" gives "hits"
+
+        new_clips_dir = clips_dir / folder_name
+        os.makedirs(new_clips_dir, exist_ok=True)
+
+        output_path = new_clips_dir / f"{label}_{i+num}{video_path.suffix}"
+
+        clip_video(
+                 video_path=video_path, 
+                 start_time= max(0, time - 8), 
+                 duration=20, 
+                 output_path=output_path
+                 )
     
             #os.remove(video_path)
 
