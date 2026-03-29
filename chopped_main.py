@@ -1,6 +1,6 @@
 import os
 import json
-from utilities import find_and_convert_video, extract_audio, transcribe_audio
+from utilities import find_video, extract_audio, transcribe_audio
 
 # Map each phrase to its type and label for the JSON output
 trigger_phrases = {
@@ -57,19 +57,20 @@ def delete_file(path):
 
 def main():
 
-    # Step 1: Find and rename video to video.mp4
+    # Find and rename video to video.mp4
     print("Searching for video file...")
-    original_name = find_and_convert_video()
+    original_name = find_video()
     if not original_name:
         return
+    original_name = original_name.rsplit(".", 1)[0]
 
     video_path = "video.mp4"
     audio_path = "audio.wav"
 
-    # Step 2: Extract audio
+    # Extract audio
     extract_audio(video_path, audio_path)
 
-    # Step 3: Transcribe audio
+    # Transcribe audio
     segments = transcribe_audio(audio_path)
 
     if not segments:
@@ -78,21 +79,21 @@ def main():
 
     print(f"Transcription complete. {len(segments)} segments found.")
 
-    # Step 4: Search for trigger phrases and build JSON output
+    # Search for trigger phrases and build JSON output
     matches = find_trigger_segments(segments)
     if not matches:
         print("No trigger phrases found in transcript.")
         return
 
-    # Step 5: Write results to JSON file
+    # Write results to JSON file
     output_path = f"{original_name}.json"
     with open(output_path, "w") as f:
         json.dump(matches, f, indent=4)
     print(f"\nDetected {len(matches)} voiceline(s). Saved to {output_path}")
 
-    # Step 6: Delete the original video and audio files
-    delete_file(video_path)
+    # Delete the audio file
     delete_file(audio_path)
 
+
 if __name__ == "__main__":
-    main())
+    main()
