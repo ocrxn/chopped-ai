@@ -81,7 +81,7 @@ def process_video(events_file, clips_dir = "clips"):
             clip_video(
                 video_path=video_path, 
                 start_time= max(0, time - 8), 
-                duration=8, 
+                duration=20, 
                 output_path=output_path
                 )
           elif event_type == "outs":
@@ -91,7 +91,7 @@ def process_video(events_file, clips_dir = "clips"):
             clip_video(
                 video_path=video_path, 
                 start_time= max(0, time - 8),
-                duration=8, 
+                duration=20, 
                 output_path=output_path
                 )
           elif event_type == "error":
@@ -101,7 +101,7 @@ def process_video(events_file, clips_dir = "clips"):
             clip_video(
                 video_path=video_path, 
                 start_time= max(0, time - 8),
-                duration=8,
+                duration=20,
                 output_path=output_path
                 )
           elif event_type == "bunt":
@@ -111,7 +111,7 @@ def process_video(events_file, clips_dir = "clips"):
             clip_video(
                 video_path=video_path, 
                 start_time= max(0, time - 8),
-                duration=8,
+                duration=20,
                 output_path=output_path
                 )
           if event_type == "pickoffs":
@@ -121,7 +121,7 @@ def process_video(events_file, clips_dir = "clips"):
             clip_video(
                 video_path=video_path, 
                 start_time= max(0, time - 8), 
-                duration=8, 
+                duration=20, 
                 output_path=output_path
                 )
     
