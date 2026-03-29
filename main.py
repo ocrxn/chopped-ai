@@ -224,7 +224,11 @@ def shutdown():
         return jsonify({"SIGINT trigger":"Success","Content":"Flask server shutting down..."})
     else:
         shutdown_server()
-        return jsonify({"Werkzeug trigger":"Success","Content":"Flask server shutting down..."})
+        return jsonify({"Werkzeug trigger":"Success","Content":"Flask server shutting down..."}) 
+    
+@app.route("/explain")
+def explain():
+    return render_template("explain.html")
 
 
 if __name__ == "__main__":

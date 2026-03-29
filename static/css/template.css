@@ -329,4 +329,47 @@ font-weight: 700;
   align-items: center;
 }  
 
+/* Upload */ 
 
+.upload { 
+    background-color: #a5be00;
+} 
+
+.upload__container { 
+    margin: 20px;
+    background-color: #a5be00;
+} 
+
+.upload__container h1 {
+ align-content: left;
+} 
+
+.upload__container h2 { 
+ align-content: left;
+}
+
+/* Profile */ 
+
+.profile { 
+    background-color: #a5be00;
+} 
+
+.profile__container { 
+    margin: 20px;
+    background-color: #a5be00;
+} 
+
+.profile__container h1 {
+ align-content: left;
+ color: white;
+} 
+
+.profile__container h2 { 
+ align-content: left;
+ color: white;
+}
+
+.profile__container h3 { 
+ align-content: left;
+ color: white;
+}

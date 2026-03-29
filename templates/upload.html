@@ -5,11 +5,13 @@
 
 
 {% block content %}
-
+<div class="upload"> 
+  <div class="upload__container"> 
   <h1> Upload your Video (and Audio) Files </h1>
   <br>
   <h2>Max File Size: 1 MB</h2>
-
+  </div> 
+ 
   <form method="POST" action="{{ url_for('upload') }}" enctype="multipart/form-data">
     <div id="form_div">
 
@@ -50,5 +52,5 @@
           </div>
         </div>
   </form>
-
+</div>
 {% endblock %}
