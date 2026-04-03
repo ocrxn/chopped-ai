@@ -6,6 +6,7 @@ from pathlib import Path
 import json
 import os
 import random
+#from config import BASE_DIR
 
 BASE_DIR = Path(__file__).resolve().parent
 #gets absolute path of current Python file and returns directory it’s located in; makes BASE_DIR a path
@@ -93,11 +94,12 @@ def process_video(events_file, clips_dir = "clips"):
         clip_video(
                  video_path=video_path, 
                  start_time= max(0, time - 8), 
-                 duration=20, 
+                 duration=25, 
                  output_path=output_path
                  )
     
-            os.remove(video_path)
+     os.remove(video_path)
+     os.remove(events_file)
 
 json_dir = BASE_DIR / "json"
 
@@ -109,7 +111,6 @@ for json_file in json_dir.glob("*.json"):
         process_video(json_file, clips_dir = game_clips_dir)
             #process_video will make a new directory within the clips folder
             #it will have the name of json_file.stem
-        os.remove(json_file)
     except Exception as e:
         print(f"Error processing {json_file.name}: {e}")
     #if error happens in try block, store in variable e, and print that error as a message
