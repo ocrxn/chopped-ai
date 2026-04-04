@@ -12,10 +12,11 @@
     </ul>
   {% endif %}
 {% endwith %}
-
+<div id="header_div">
   <h1> Upload your Video (and Audio) Files </h1>
   <br>
   <h2>Max File Size: {{ file_size }} {{ base }}</h2>
+  </div>
 
 <form method="POST" action="{{ url_for('upload') }}" enctype="multipart/form-data">
     <div id="form_div">
@@ -27,7 +28,7 @@
             <div class="audio-box">
                 <label class="audio-checkbox">
                     <input type="checkbox" id="include_audio" name="include_audio">
-                    Includes Audio File
+                    <h3>Includes Audio File</h3>
                 </label>
 
                 <div class="audio-input">

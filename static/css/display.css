@@ -1,0 +1,30 @@
+.zip-container {
+    position: fixed;
+    top: 250px;
+    right: 350px;
+    z-index: 1000;
+}
+
+.zip-btn {
+
+    display: inline-block;
+    padding: 40px 100px;
+    background-color: #0040ff;
+    color: white;
+    text-decoration: none;
+    font-family: sans-serif;
+    font-weight: bold;
+    border: 2px solid #000;
+    border-radius: 25px;
+    text-align: center;
+    transition: background 0.2s ease;
+}
+
+.zip-btn:hover {
+    background-color: #1f0c8a;
+    cursor: pointer;
+}
+
+.zip-btn:active {
+    background-color: #3420a6;
+}

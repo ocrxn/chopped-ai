@@ -122,7 +122,7 @@ def upload():
                 cmpr_size = result.get("cmpr_size")
 
                 #Zip the files
-                fh.zip_clips(clips_dir=CLIPS_FOLDER,zip_dir=ZIP_FOLDER)
+                # fh.zip_clips(filename=video_filename,clips_dir=CLIPS_FOLDER,zip_dir=ZIP_FOLDER)
 
 
             except Exception as e:
@@ -283,7 +283,6 @@ def shutdown():
     else:  
         shutdown_server()
         return redirect("https://www.google.com")
-
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5050, debug=False)

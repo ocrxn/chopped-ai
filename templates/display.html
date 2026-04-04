@@ -1,4 +1,10 @@
 {% extends "template.html" %}
+{% block title %}Display{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/display.css') }}">
+{% endblock %}
+
 {% block content %}
 {% with messages = get_flashed_messages(with_categories=true) %}
   {% if messages %}
@@ -22,5 +28,10 @@
 </a>
 <h3>[Compression Mode: {{ cmpr_mode or 'None' }}]</h3>
 <h3>[File Size: {{ cmpr_size or 'Original'}}] MB</h3>
+<div class="zip-container">
+  <h1>Download your zip file here</h1>
+  <a href="www.google.com" class="zip-btn">Download zip</a>
+
+</div>
 
 {% endblock %}

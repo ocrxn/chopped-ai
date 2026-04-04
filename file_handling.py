@@ -154,14 +154,14 @@ class FileHandler():
                 f.write(f"[{datetime.now()}] ERROR on {filename}: {e.stderr}\n")
             return {"status": "error", "message": e}
         
-    def zip_clips(self, clips_dir, zip_dir):
+    def zip_clips(self, filename, clips_dir, zip_dir):
         """
         Takes the directory of clips created and returns them as a zip file
         """
         if not os.path.exists(zip_dir):
             os.mkdir(zip_dir)
 
-        zip_path = os.path.join(zip_dir, "")
+        zip_path = os.path.join(zip_dir, f"{filename}.zip")
 
         with zipfile.ZipFile(zip_dir, 'w', zipfile.ZIP_DEFLATED) as fzip:
             pass
