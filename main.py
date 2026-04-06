@@ -3,7 +3,6 @@ from dotenv import load_dotenv
 from email_verif import connect_smtp
 from werkzeug.utils import secure_filename
 import os
-import sys
 import signal
 import json
 import subprocess
@@ -11,7 +10,6 @@ import time
 import datetime
 import tempfile
 import shutil
-import traceback
 
 from db_conn import Connection
 from config import UPLOAD_FOLDER, CLIPS_FOLDER, ZIP_FOLDER
@@ -132,8 +130,6 @@ def upload():
 
             except Exception as e:
                 flash(f"An error has occurred: {e}")
-                app.logger.error("Exception occurred", exc_info=True)
-
                 return redirect(url_for('upload'))
             finally:
                 if temp_vid_path and os.path.exists(temp_vid_path):

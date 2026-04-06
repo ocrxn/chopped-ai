@@ -85,7 +85,3 @@ def create_json_file(video_path,audio_path,video_name):
 
     # Delete the audio file
     delete_file(audio_path)
-
-
-if __name__ == "__main__":
-    create_json_file()
