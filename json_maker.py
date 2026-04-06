@@ -1,6 +1,7 @@
 import os
 import json
-from utilities import find_video, extract_audio, transcribe_audio
+from json_utilities import find_video, extract_audio, transcribe_audio
+from config import UPLOAD_FOLDER
 
 # Map each phrase to its type and label for the JSON output
 trigger_phrases = {
@@ -55,20 +56,11 @@ def delete_file(path):
         print(f"Could not delete {path} — you can delete it manually.")
 
 
-def main():
-
-    # Find and rename video to video.mp4
-    print("Searching for video file...")
-    original_name = find_video()
-    if not original_name:
-        return
-    original_name = original_name.rsplit(".", 1)[0]
-
-    video_path = "video.mp4"
-    audio_path = "audio.wav"
-
-    # Extract audio
-    extract_audio(video_path, audio_path)
+def create_json_file(video_path,audio_path,video_name):
+    # Extract audio if separate audio not provided
+    if audio_path == None:
+        audio_path = f"{video_name}.wav"
+        extract_audio(video_path, audio_path)
 
     # Transcribe audio
     segments = transcribe_audio(audio_path)
@@ -86,7 +78,7 @@ def main():
         return
 
     # Write results to JSON file
-    output_path = f"{original_name}.json"
+    output_path = os.path.join(UPLOAD_FOLDER, f"{video_name}.json")
     with open(output_path, "w") as f:
         json.dump(matches, f, indent=4)
     print(f"\nDetected {len(matches)} voiceline(s). Saved to {output_path}")
@@ -96,4 +88,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    create_json_file()

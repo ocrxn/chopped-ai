@@ -3,6 +3,7 @@ from dotenv import load_dotenv
 from email_verif import connect_smtp
 from werkzeug.utils import secure_filename
 import os
+import sys
 import signal
 import json
 import subprocess
@@ -10,10 +11,12 @@ import time
 import datetime
 import tempfile
 import shutil
+import traceback
 
 from db_conn import Connection
 from config import UPLOAD_FOLDER, CLIPS_FOLDER, ZIP_FOLDER
 from file_handling import FileHandler
+from json_maker import create_json_file
 
 app = Flask(__name__)
 load_dotenv()
@@ -38,13 +41,6 @@ def home():
         return is_logged_out
     return render_template("home.html")
 
-@app.route("/profile", methods=["GET","POST"])
-def profile():
-    is_logged_out = require_login()
-    if is_logged_out:
-        return is_logged_out
-    return render_template("profile.html")
-
 @app.route("/upload", methods=["GET","POST"])
 def upload():
     is_logged_out = require_login()
@@ -68,10 +64,13 @@ def upload():
 
             #Create secure filenames, extract exts, and make paths
             video_filename = secure_filename(video_file.filename)
+            video_name_only = os.path.splitext(video_filename)[0].lower().replace(".", "")
             video_extension = os.path.splitext(video_filename)[1].lower().replace(".", "")
             video_upload_path = os.path.join(UPLOAD_FOLDER, video_filename)
 
+
             audio_filename = secure_filename(audio_file.filename) if audio_file else None
+            audio_name_only = os.path.splitext(audio_filename)[0].lower().replace(".", "") if audio_file else None
             audio_extension = os.path.splitext(audio_filename)[1].lower().replace(".", "") if audio_file else None
             audio_upload_path = os.path.join(UPLOAD_FOLDER, audio_filename) if audio_file else None
 
@@ -90,7 +89,7 @@ def upload():
                     temp_audio_path = temp_audio.name
                     audio_file.save(temp_audio_path)
                     temp_audio.flush()
-      
+
             try:
                 fh = FileHandler()
                 kwargs = {
@@ -118,15 +117,23 @@ def upload():
                 else:
                     # Skip compression and move video from temp to uploads
                     shutil.move(temp_vid_path,video_upload_path) 
-                
-                cmpr_size = result.get("cmpr_size")
 
-                #Zip the files
+                
+                #<---------Make json file--------------->
+                create_json_file(video_upload_path,audio_upload_path,video_name_only)
+
+                #<---------Create clips--------------->
+
+                #<---------Zip clips--------------->
                 # fh.zip_clips(filename=video_filename,clips_dir=CLIPS_FOLDER,zip_dir=ZIP_FOLDER)
+
+                cmpr_size = result.get("cmpr_size")
 
 
             except Exception as e:
                 flash(f"An error has occurred: {e}")
+                app.logger.error("Exception occurred", exc_info=True)
+
                 return redirect(url_for('upload'))
             finally:
                 if temp_vid_path and os.path.exists(temp_vid_path):
@@ -232,6 +239,15 @@ def logout():
     else:
         flash("Internal server error: unable to locate session/user.")
 
+
+@app.route("/profile", methods=["GET","POST"])
+def profile():
+    is_logged_out = require_login()
+    if is_logged_out:
+        return is_logged_out
+    return render_template("profile.html")
+
+
 @app.route("/delete", methods=["POST"])
 def delete():
     try:
@@ -262,13 +278,16 @@ def delete():
         flash(f"An unknown error has occurred: {e}")
         return redirect(url_for("profile"))
 
+
 @app.route("/about")
 def about():
     return render_template("about.html")
 
+
 @app.route("/explain")
 def explain():
     return render_template("explain.html")
+
 
 @app.route("/shutdown", methods=["POST"])
 def shutdown():
@@ -283,5 +302,6 @@ def shutdown():
         shutdown_server()
         return redirect("https://www.google.com")
 
+
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5050, debug=False)
+    app.run(host="0.0.0.0", port=5050, debug=True)
