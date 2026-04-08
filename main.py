@@ -25,7 +25,8 @@ app.config['MAX_CONTENT_LENGTH'] = 1024*1024 * 1024 * 15 #15 GB
 
 @app.errorhandler(413)
 def max_file_size_exceeded(e):
-    return "File size exceeded!", 413
+    flash("Error 413: File size exceeded!")
+    return redirect(url_for("upload"))
 
 def require_login():
     if "user" not in session:
@@ -61,7 +62,8 @@ def upload():
             video_file = request.files.get('video_upload_file')
             audio_file = request.files.get('audio_upload_file')
             if not video_file or video_file.filename == "":
-                return jsonify({'Error': 'File part not found.'})
+                flash("Error 404: File could not be found.")
+                return redirect(url_for("upload"))
 
             #Create secure filenames, extract exts, and make paths
             video_filename = secure_filename(video_file.filename)
@@ -165,7 +167,8 @@ def display(filename):
 def get_video(filename):
     path = os.path.join(UPLOAD_FOLDER, filename)
     if not os.path.exists(path):
-        return "File not found", 404
+        flash("Error 404: File not found.")
+        return redirect(url_for("home"))
 
     return send_file(path, as_attachment=False)
 
