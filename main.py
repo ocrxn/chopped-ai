@@ -12,7 +12,7 @@ import tempfile
 import shutil
 
 from db_conn import Connection
-from config import UPLOAD_FOLDER, CLIPS_FOLDER, ZIP_FOLDER
+from config import UPLOAD_FOLDER, CLIPS_FOLDER, ZIP_FOLDER, init_dirs
 from file_handling import FileHandler
 from json_maker import create_json_file
 
@@ -54,6 +54,9 @@ def upload():
 
     if request.method == "POST":
         try:
+            #Initializes directories if not exists
+            init_dirs()
+
             #Get video/audio files from website and return if empty
             video_file = request.files.get('video_upload_file')
             audio_file = request.files.get('audio_upload_file')
