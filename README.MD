@@ -93,7 +93,3 @@
 `git commit -m "Ex: Merged branch: <branch_name>"`
 ## 5. Push committed changes to Github
 `git push`
-
-
-# Create Public IP Address using Ngrok
-`ngrok http 5050`
