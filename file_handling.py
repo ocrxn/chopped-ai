@@ -6,8 +6,6 @@ from datetime import datetime
 import shutil
 import zipfile
 
-
-
 class FileHandler():
     def detect_hardware_encoder(self):
         """
@@ -165,3 +163,11 @@ class FileHandler():
 
         with zipfile.ZipFile(zip_dir, 'w', zipfile.ZIP_DEFLATED) as fzip:
             pass
+        
+    def error_logger(self, errors):
+        with open("error_logs.txt","w") as file:
+            if type(errors) == str:
+                file.write(errors)
+            else:
+                for e in errors:
+                    file.write(e)
