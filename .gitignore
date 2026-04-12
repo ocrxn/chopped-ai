@@ -1,6 +1,7 @@
 .env
 todo.txt
 notes.txt
+error_logs.txt
 *.pyc
 *.pyo
 venv/
@@ -12,6 +13,7 @@ static/.DS_STORE
 /__pycache__/
 
 /uploads/
+/json/
 /clips/
 /zips/
 
