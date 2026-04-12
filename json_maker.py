@@ -1,7 +1,7 @@
 import os
 import json
 from json_utilities import extract_audio, transcribe_audio
-from config import UPLOAD_FOLDER
+from config import JSON_FOLDER
 
 # Map each phrase to its type and label for the JSON output
 trigger_phrases = {
@@ -66,19 +66,17 @@ def create_json_file(video_path,audio_path,video_name):
     segments = transcribe_audio(audio_path)
 
     if not segments:
-        print("No transcription available.")
-        return
+        return "No transcription available."
 
     print(f"Transcription complete. {len(segments)} segments found.")
 
     # Search for trigger phrases and build JSON output
     matches = find_trigger_segments(segments)
     if not matches:
-        print("No trigger phrases found in transcript.")
-        return
+        return "No trigger phrases found in transcript."
 
     # Write results to JSON file
-    output_path = os.path.join(UPLOAD_FOLDER, f"{video_name}.json")
+    output_path = os.path.join(JSON_FOLDER, f"{video_name}.json")
     with open(output_path, "w") as f:
         json.dump(matches, f, indent=4)
     print(f"\nDetected {len(matches)} voiceline(s). Saved to {output_path}")

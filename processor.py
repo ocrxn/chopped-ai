@@ -1,13 +1,13 @@
-#takes timestamps + labels and decides where clips start and end
+from __future__ import annotations
 from pathlib import Path
 import json
 import os
 import random
-from __future__ import annotations
 import subprocess
 from pathlib import Path
-from config import BASE_DIR, CLIPS_FOLDER
+from config import BASE_DIR, UPLOAD_FOLDER, CLIPS_FOLDER, JSON_FOLDER
 
+#takes timestamps + labels and decides where clips start and end
 
 #gets absolute path of current Python file and returns directory it’s located in; makes BASE_DIR a path
 #__file__ is the path to the current Python file
@@ -42,7 +42,6 @@ def clip_video(video_path: str, output_path: str, start_time: int, duration: int
     ]
 
     subprocess.run(command, check=True)
-    os.remove(video_path)
 
 #function to load events from .json file
 def load_events(events_file):
@@ -68,17 +67,17 @@ def load_events(events_file):
 
 def matching_video(events_file, uploads_dir="uploads"): #debugged
     events_file=Path(events_file)
-    uploads_dir = BASE_DIR / uploads_dir #combines base directory with uploads directory to create full path to uploads directory
+    uploads_dir = Path(UPLOAD_FOLDER)
 
     json_stem = events_file.stem # ex: takes game_0001 from game_0001.json
 
     possible_extensions = [".mp4", ".mov", ".webm", ".mkv"]
     
+    #for loop to iterate through uploads directory to see if a video matches  json file name
     for ext in possible_extensions:
          video_path = uploads_dir / f"{json_stem}{ext}"
          if video_path.exists():
               return video_path
-    #for loop to iterate through uploads directory to see if a video matches  json file name
     
     raise FileNotFoundError(
          f"No matching video for {events_file.name} in {uploads_dir}"
@@ -115,10 +114,10 @@ def process_video(events_file, clips_dir = "clips"):
         folder_name = folder_map[event_type]
         #folder_map(event_type) means event type "hit" gives "hits"
 
-        new_clips_dir = clips_dir / folder_name
+        new_clips_dir = os.path.join(clips_dir, folder_name)
         os.makedirs(new_clips_dir, exist_ok=True)
 
-        output_path = new_clips_dir / f"{label}_{i+num}{video_path.suffix}"
+        output_path = os.path.join(new_clips_dir, f"{label}_{i+num}{video_path.suffix}")
 
         clip_video(
                  video_path=video_path, 
@@ -130,12 +129,11 @@ def process_video(events_file, clips_dir = "clips"):
      os.remove(video_path)
      os.remove(events_file)
 
-json_dir = BASE_DIR / "json"
-
 def run_processor():
     """
     Runs the ffmpeg process to cut the clips from the video
     """
+    json_dir = Path(JSON_FOLDER)
     for json_file in json_dir.glob("*.json"):
         #glob says must start with game_, * is a wildcard, and must end with .json (or whatever the filename is)
         try:
@@ -145,4 +143,5 @@ def run_processor():
             process_video(json_file, clips_dir = game_clips_dir)
                 
         except Exception as e:
-            print(f"Error processing {json_file.name}: {e}")
+            return f"Error processing {json_file.name}: {e}"
+    return

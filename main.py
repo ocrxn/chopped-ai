@@ -56,13 +56,18 @@ def upload():
 
     if request.method == "POST":
         try:
+            fh = FileHandler()
+
             #Initializes directories if not exists
-            init_dirs()
+            create_dirs = init_dirs()
+            if create_dirs != None:
+                fh.error_logger(create_dirs)
 
             #Get video/audio files from website and return if empty
             video_file = request.files.get('video_upload_file')
             audio_file = request.files.get('audio_upload_file')
             if not video_file or video_file.filename == "":
+                fh.error_logger("Error 404: File could not be found.")
                 flash("Error 404: File could not be found.")
                 return redirect(url_for("upload"))
 
@@ -71,7 +76,6 @@ def upload():
             video_name_only = os.path.splitext(video_filename)[0].lower().replace(".", "")
             video_extension = os.path.splitext(video_filename)[1].lower().replace(".", "")
             video_upload_path = os.path.join(UPLOAD_FOLDER, video_filename)
-
 
             audio_filename = secure_filename(audio_file.filename) if audio_file else None
             audio_name_only = os.path.splitext(audio_filename)[0].lower().replace(".", "") if audio_file else None
@@ -95,7 +99,6 @@ def upload():
                     temp_audio.flush()
 
             try:
-                fh = FileHandler()
                 kwargs = {
                         "vid_filename": video_filename,
                         "audio_filename": audio_filename,
@@ -122,15 +125,18 @@ def upload():
                     # Skip compression and move video from temp to uploads
                     shutil.move(temp_vid_path,video_upload_path) 
 
-                
                 #<---------Make json file--------------->
-                create_json_file(video_upload_path,audio_upload_path,video_name_only)
+                cjf = create_json_file(video_upload_path,audio_upload_path,video_name_only)
+                if cjf != None:
+                    fh.error_logger(cjf)
 
                 #<---------Create clips--------------->
-                run_processor()
+                rp = run_processor()
+                if rp != None:
+                    fh.error_logger(rp)
                 
                 #<---------Zip clips--------------->
-                # fh.zip_clips(filename=video_filename,clips_dir=CLIPS_FOLDER,zip_dir=ZIP_FOLDER)
+                fh.zip_clips(filename=video_name_only,clips_dir=CLIPS_FOLDER,zip_dir=ZIP_FOLDER)
 
                 cmpr_size = result.get("cmpr_size")
 

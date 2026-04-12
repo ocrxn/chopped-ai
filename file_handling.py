@@ -156,18 +156,25 @@ class FileHandler():
         """
         Takes the directory of clips created and returns them as a zip file
         """
-        if not os.path.exists(zip_dir):
-            os.mkdir(zip_dir)
-
+        clips_dir = os.path.join(clips_dir, filename)
         zip_path = os.path.join(zip_dir, f"{filename}.zip")
 
-        with zipfile.ZipFile(zip_dir, 'w', zipfile.ZIP_DEFLATED) as fzip:
-            pass
+        with zipfile.ZipFile(zip_path, 'w', zipfile.ZIP_DEFLATED) as fzip:
+            for root, _, files in os.walk(clips_dir):
+                for file in files:
+                    file_path = os.path.join(root, file)
+                    arcname = os.path.relpath(file_path, clips_dir)
+                    fzip.write(file_path, arcname=arcname)
         
     def error_logger(self, errors):
+        """
+        Gets passed error(s) and writes dumps them to a txt file along with the date & time
+        """
+        error_string = f"""-------------------------------\nDate: {datetime.now().strftime("%Y-%m-%d %H:%M:%S")}\n"""
+        if type(errors) == str:
+            error_string += f"Error: {errors}\n"
+        else:
+            for i,error in enumerate(errors):
+                error_string += f"Error {i+1}: {error}\n"
         with open("error_logs.txt","w") as file:
-            if type(errors) == str:
-                file.write(errors)
-            else:
-                for e in errors:
-                    file.write(e)
+            file.write(error_string)
