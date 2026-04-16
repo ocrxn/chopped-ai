@@ -2,6 +2,7 @@ from flask import Flask, render_template, abort, send_file,redirect, url_for, se
 from dotenv import load_dotenv
 from email_verif import connect_smtp
 from werkzeug.utils import secure_filename
+from waitress import serve
 import os
 import signal
 import json
@@ -41,6 +42,7 @@ def max_file_size_exceeded():
 
 def require_login():
     """
+    Checks if user is in session, otherwise returns user to login screen
     """
     if "user" not in session:
         return redirect(url_for("login"))
@@ -49,6 +51,7 @@ def require_login():
 @app.route("/", methods=["GET","POST"])
 def home():
     """
+    Return main page [requires logged in]
     """
     is_logged_out = require_login()
     if is_logged_out:
@@ -58,6 +61,9 @@ def home():
 @app.route("/upload", methods=["GET","POST"])
 def upload():
     """
+    GET: Return upload page [requires logged in]\n
+    POST: Uploads the video to backend and calls various other functions
+    to create the zip file using the video
     """
     is_logged_out = require_login()
     if is_logged_out:
@@ -131,8 +137,7 @@ def upload():
                 if encoding and encoding != "none":
                     # Compress the video if user selected a compression mode
                     result = compress_video(kwargs)
-                    print(result)
-
+                    
                 else:
                     # Skip compression and move video from temp to uploads
                     shutil.move(temp_vid_path,video_upload_path) 
@@ -147,6 +152,13 @@ def upload():
                 zip_clips(filename=video_name_only,clips_dir=CLIPS_FOLDER,zip_dir=ZIP_FOLDER)
                 cmpr_size = result.get("cmpr_size")
 
+                #<---------Delete original video if encoding=None--------------->
+                enable_video = True
+                if not encoding or encoding == "none":
+                    enable_video = False
+                    os.remove(video_upload_path)
+                    logging.info(f"[upload] (encoding=None) Removed original video file: {video_name_only} ")
+
             except Exception as e:
                 logging.error(f"[upload] An error has occurred: {e}")
                 flash(f"An error has occurred: {e}")
@@ -156,7 +168,8 @@ def upload():
                     os.remove(temp_vid_path)
                 if temp_audio_path and os.path.exists(temp_audio_path):
                     os.remove(temp_audio_path)
-            return redirect(url_for("display", 
+            return redirect(url_for("display",
+                                    enable_video = enable_video,
                                     filename=video_filename, 
                                     zip_name = f"{video_name_only}.zip", 
                                     cmpr_mode=encoding, cmpr_size=cmpr_size))
@@ -174,21 +187,24 @@ def upload():
 @app.route("/display/<filename>")
 def display(filename):
     """
+    Return display page of video/zip file [requires logged in]
     """
     is_logged_out = require_login()
     if is_logged_out:
         return is_logged_out
+    enable_video = request.args.get("enable_video")
     zip_name = request.args.get("zip_name")
     cmpr_mode = request.args.get("cmpr_mode")
     cmpr_size_long = int(request.args.get("cmpr_size")) / (1024 * 1024)
     cmpr_size = "{:.2f}".format(cmpr_size_long)
 
-    return render_template("display.html", filename=filename, zip_name=zip_name, cmpr_mode=cmpr_mode, cmpr_size=cmpr_size)
+    return render_template("display.html", enable_video=enable_video,filename=filename, zip_name=zip_name, cmpr_mode=cmpr_mode, cmpr_size=cmpr_size)
 
 
 @app.route("/get_video/<filename>")
 def get_video(filename):
     """
+    Returns the video file for display.html
     """
     path = os.path.join(UPLOAD_FOLDER, filename)
     if not os.path.exists(path):
@@ -201,6 +217,7 @@ def get_video(filename):
 @app.route("/download_zip/<filename>")
 def download_zip(filename):
     """
+    Returns the zip file path for display.html as downloadable attachment
     """
     path = os.path.join(ZIP_FOLDER, filename)
     
@@ -214,6 +231,8 @@ def download_zip(filename):
 @app.route("/login", methods=["GET", "POST"])
 def login():
     """
+    GET: Returns login page\n
+    POST: Validates input credentials against PostgreSQL database
     """
     if request.method == "GET":
         return render_template("login.html")
@@ -240,6 +259,8 @@ def login():
 @app.route("/signup", methods=["GET", "POST"])
 def signup():
     """
+    GET: Returns signup page\n
+    POST: Create a user account in PostgreSQL database
     """
     if request.method == "GET":
         return render_template("signup.html")
@@ -275,6 +296,7 @@ def signup():
 @app.route("/logout")
 def logout():
     """
+    Pops user from session and returns login screen
     """
     username = session.get("user")
     if username:
@@ -293,6 +315,7 @@ def logout():
 @app.route("/profile", methods=["GET","POST"])
 def profile():
     """
+    Returns profile page [requires logged in]
     """
     is_logged_out = require_login()
     if is_logged_out:
@@ -303,6 +326,7 @@ def profile():
 @app.route("/delete", methods=["POST"])
 def delete():
     """
+    POST: Delete account from database [requires logged in]
     """
     try:
         is_logged_out = require_login()
@@ -341,6 +365,7 @@ def delete():
 @app.route("/about")
 def about():
     """
+    Return about page
     """
     return render_template("about.html")
 
@@ -348,6 +373,7 @@ def about():
 @app.route("/explain")
 def explain():
     """
+    Return explain page
     """
     return render_template("explain.html")
 
@@ -355,6 +381,7 @@ def explain():
 @app.route("/shutdown", methods=["POST"])
 def shutdown():
     """
+    POST: Shutdown the Flask server using werkzeug or SIGINT [requires logged in as admin]
     """
     if session.get("user") != 'admin':
         abort(403)
@@ -369,4 +396,4 @@ def shutdown():
         return redirect("https://www.google.com")
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5050, debug=True)
+    serve(app, port=5050)

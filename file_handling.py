@@ -21,6 +21,7 @@ def init_dirs():
             os.mkdir(CLIPS_FOLDER)
         if not os.path.exists(ZIP_FOLDER):
             os.mkdir(ZIP_FOLDER)
+        logging.info("[init_dirs] Initialized necesary directories")
     except Exception as e:
         logging.error(f"[init_dirs] Exception in init_dirs: {e}")
         return f"Exception in init_dirs: {e}"
@@ -156,18 +157,11 @@ def compress_video(kwargs):
         f"Status: {status}\n"
         "----------------------------------------\n"
     )
-        log_file_path = os.path.join(output_dir, "compression_log.txt")
-        with open(log_file_path, "a") as f:
-            f.write(log_text)
+        logging.info(f"\n\n[compress_video] {log_text}\n\n")
         return {"status": "success", "cmpr_size": compressed_size}
     
     except subprocess.CalledProcessError as e:
-        print(f"--- FFMPEG LOG START ---")
-        print(e.stderr) 
-        print(f"--- FFMPEG LOG END ---")
-        log_file_path = os.path.join(output_dir, "compression_log.txt")
-        with open(log_file_path, "a") as f:
-            f.write(f"[{datetime.now()}] ERROR on {filename}: {e.stderr}\n")
+        logging.error(f"[compress_video] FFMPEG ERROR: {e.stderr} ")
         return {"status": "error", "message": e}
     
 def zip_clips(filename, clips_dir, zip_dir):

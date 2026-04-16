@@ -17,6 +17,7 @@
   {% endif %}
 {% endwith %}
 
+{% if enable_video %}
 <h1> Video </h1>
 <br>
 <video width="560px" height="420px" controls>
@@ -27,8 +28,10 @@
 <a href="{{ url_for('get_video', filename=filename) }}" download>
   Download Video 
 </a>
+{% endif %}
+
 <h3>[Compression Mode: {{ cmpr_mode or 'None' }}]</h3>
-<h3>[File Size: {{ cmpr_size or 'Original'}}] MB</h3>
+<h3>File Size: [{{ cmpr_size or 'Original'}}] MB</h3>
 <div class="zip-container">
   <h1>Download your zip file here</h1>
   <a href="{{ url_for('download_zip', filename=zip_name) }}" class="zip-btn">Download Zip</a>
