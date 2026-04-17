@@ -1,11 +1,9 @@
 name: Build Executables
-
 on:
   push:
     tags:
       - "v*"
   workflow_dispatch:
-
 jobs:
   build:
     strategy:
@@ -20,30 +18,21 @@ jobs:
           - os: ubuntu-latest
             output_name: app-linux
             separator: ":"
-
     runs-on: ${{ matrix.os }}
-
+    env:
+      DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      APP_KEY: ${{ secrets.APP_KEY }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-
       - name: Install dependencies
         run: |
           pip install -r requirements.txt
           pip install pyinstaller
-
-      - name: Inject Database Secret
-        uses: jacobtomlinson/gha-find-replace@v3
-        with:
-          find: 'os.getenv("DATABASE_URL")'
-          replace: '"${{ secrets.DATABASE_URL }}"'
-          include: "db_conn.py"
-
       - name: Build executable
         run: >
           pyinstaller
@@ -54,27 +43,22 @@ jobs:
           --hidden-import imageio
           --collect-all imageio
           main.py
-
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.output_name }}
           path: dist/${{ matrix.output_name }}
-
   release:
     needs: build
     runs-on: ubuntu-latest
     if: startsWith(github.ref, 'refs/tags/')
-
     permissions:
       contents: write
-
     steps:
       - name: Download all artifacts
         uses: actions/download-artifact@v4
         with:
           path: dist/
-
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
