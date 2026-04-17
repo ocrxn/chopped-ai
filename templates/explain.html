@@ -8,14 +8,63 @@
 <div class="main">  
   <div class="main__container">
       <div class="main__content">
-      <h1>How it Works</h1>
-      <h2>Unleash the Power of your team</h2>
-      <p>Your one-stop solution for all your replay needs. Explore our cutting-edge tools and services designed to empower your creativity and productivity.</p>
-      <button class="main__btn"><a href="{{ url_for('upload') }}">Get Started</a></button>
-  </div>
+            <h1>How it Works</h1>
+<!-- Step 1 --> 
+            <h2>Step 1 Media Upload</h2>
+            <p>Users uploads media in the form of a video file and audio file, or just a video file with audio</p>
+            <button class="main__btn"><a href="{{ url_for('upload') }}">Get Started</a></button>
+        </div>
       <div class="main__image">
-          <img src="static\images\ControlPanel.svg" alt="Main Image" id="main__img">
+          <img src="static\images\Upload.svg" alt="upload Image" id="main__img">
       </div>
-  </div>
+<!-- Step 2 -->
+        <div class="main__image">
+          <img src="static\images\compress.svg" alt="upload Image" id="main__img">
+        </div>
+      <div class="main__content">
+            <h2>Step 2 Video Compression</h2>
+            <p>The video file is then compressed into a zip and readable file for our backend</p>
+        </div> 
+<!-- Step 3 -->
+        <div class="main__content">
+            <h2>Step 3 Media to Backend</h2>
+            <p>Uploaded files are sent to the backend “server” and the video is processed</p>
+        </div>
+        <div class="main__image">
+          <img src="static\images\backend.svg" alt="upload Image" id="main__img">
+        </div>
+<!-- Step 4 -->
+        <div class="main__image">
+                <img src="static\images\backend.svg" alt="upload Image" id="main__img">
+        </div>
+        <div class="main__content">
+            <h2>Step 3 Media to Backend</h2>
+            <p>Uploaded files are sent to the backend “server” and the video is processed</p>
+        </div>
+        
+    </div>
+</div> 
+
+<!-- Footer Section --> 
+<div class="footer__container">
+    <div class="footer__links">
+        <div class="footer__link--wrapper">
+            <div class="footer__link--items">
+                <h2>Chopped</h2>
+                <a href="/explain">How It Works</a>
+                <a href="/about">About Us</a>
+            </div>
+            <div class="footer__link--items">
+                <h2>Contact Us</h2>
+                <a href="/">Contact</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- copyright section -->
+<div class="footer__container">
+     <a href="/" id="footer__logo"><i class="fas fa-gem"> </i>Chopped</a>
+     <p class="website__rights">Chopped© 2026</p> 
 </div>
 {% endblock %} 

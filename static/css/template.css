@@ -90,7 +90,7 @@ nav {
   justify-self: center;
  align-items: center;
  margin: 0 auto;
- height: 90vh;
+ height: auto;
  background-color: rgb(165, 190, 0); 
  z-index: 1; 
  width: 100%;
@@ -329,24 +329,7 @@ font-weight: 700;
   align-items: center;
 }  
 
-/* Upload */ 
 
-.upload { 
-    background-color: #a5be00;
-} 
-
-.upload__container { 
-    margin: 20px;
-    background-color: #a5be00;
-} 
-
-.upload__container h1 {
- align-content: left;
-} 
-
-.upload__container h2 { 
- align-content: left;
-}
 
 /* Profile */ 
 
