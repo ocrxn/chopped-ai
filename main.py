@@ -1,6 +1,5 @@
 from flask import Flask, render_template, abort, send_file,redirect, url_for, session, request, flash, jsonify, send_from_directory
 from dotenv import load_dotenv
-from email_verif import connect_smtp
 from werkzeug.utils import secure_filename
 from waitress import serve
 import os
@@ -285,11 +284,6 @@ def signup():
             #Set user status active in DB
             cn.update_status("UPDATE public.users SET is_active=TRUE WHERE username=%s",username)
 
-        #!!!!Temporarily disabled to prevent backend complications  #TODO
-            #Send 2FA code to user email for verification
-            #See email_verify.py for implementation
-            # connect_smtp(username, email)
-            
             return redirect(url_for("home"))
 
 
