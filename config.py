@@ -28,14 +28,9 @@ ZIP_FOLDER = os.path.join(BASE_DIR, os.getenv('zip_folder'))
 
 def init_dirs():
     try:
-        if not os.path.exists(UPLOAD_FOLDER):
-            os.mkdir(UPLOAD_FOLDER)
-        if not os.path.exists(JSON_FOLDER):
-            os.mkdir(JSON_FOLDER)
-        if not os.path.exists(CLIPS_FOLDER):
-            os.mkdir(CLIPS_FOLDER)
-        if not os.path.exists(ZIP_FOLDER):
-            os.mkdir(ZIP_FOLDER)
-        return
+        os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+        os.makedirs(CLIPS_FOLDER, exist_ok=True)
+        os.makedirs(ZIP_FOLDER, exist_ok=True)
+        os.makedirs(JSON_FOLDER, exist_ok=True)
     except Exception as e:
-        return f"Exception in init_dirs: {e}"
+        print(f"Exception in init_dirs: {e}")
