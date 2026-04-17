@@ -11,7 +11,7 @@ else:
     BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 # Neon DB
-DB_URL = os.getenv('DATABASE_URL')
+DATABASE_URL = os.getenv('DATABASE_URL')
 
 # Uploads & output
 UPLOAD_FOLDER = os.path.join(BASE_DIR, "uploads")

@@ -1,11 +1,13 @@
 import psycopg2
+import os
 from psycopg2.extras import RealDictCursor
 from dotenv import load_dotenv
-from config import *
+from config import DATABASE_URL
 import bcrypt
 import logging
 
 load_dotenv()
+DATABASE_URL = os.getenv("DATABASE_URL")
 
 class Connection:
     def __init__(self):
@@ -13,10 +15,10 @@ class Connection:
         self.password = None
 
     def connect_db(self):
-        if not DB_URL:
+        if not DATABASE_URL:
             logging.error("[connect_db] DATABASE_URL is not set. Failed to connect to database.")
             return
-        return psycopg2.connect(DB_URL)
+        return psycopg2.connect(DATABASE_URL)
 
     def update_status(self,query,username):
         try:

@@ -23,9 +23,6 @@ jobs:
 
     runs-on: ${{ matrix.os }}
 
-    env:
-      DATABASE_URL: ${{ secrets.DATABASE_URL }}
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -41,9 +38,11 @@ jobs:
           pip install pyinstaller
 
       - name: Inject Database Secret
-        shell: bash
-        run: |
-          sed -i "s|os.getenv(\"DATABASE_URL\")|\"${{ secrets.DATABASE_URL }}\"|g" db_conn.py
+        uses: jacobtomlinson/gha-find-replace@v3
+        with:
+          find: 'os.getenv("DATABASE_URL")'
+          replace: '"${{ secrets.DATABASE_URL }}"'
+          include: "db_conn.py"
 
       - name: Build executable
         run: >
