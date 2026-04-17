@@ -13,6 +13,9 @@ class Connection:
         self.password = None
 
     def connect_db(self):
+        if not DB_URL:
+            logging.error("[connect_db] DATABASE_URL is not set. Failed to connect to database.")
+            return
         return psycopg2.connect(DB_URL)
 
     def update_status(self,query,username):
@@ -53,6 +56,8 @@ class Connection:
     
 
     def confirm_user(self, username, password):
+        conn = None
+        exe = None
         try:
             conn = self.connect_db()
             exe = conn.cursor()
@@ -74,8 +79,8 @@ class Connection:
             logging.error(f"[confirm_user] Exception has occurred: {e}")
             return
         finally:
-            exe.close()
-            conn.close()
+            if exe: exe.close()
+            if conn: conn.close()
     
     def delete_user(self, username):
         try:

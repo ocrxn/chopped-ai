@@ -40,6 +40,11 @@ jobs:
           pip install -r requirements.txt
           pip install pyinstaller
 
+      - name: Inject Database Secret
+        shell: bash
+        run: |
+          sed -i "s|os.getenv(\"DATABASE_URL\")|\"${{ secrets.DATABASE_URL }}\"|g" db_conn.py
+
       - name: Build executable
         run: >
           pyinstaller
@@ -74,5 +79,4 @@ jobs:
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          # This glob pattern grabs all files within the downloaded artifact folders
           files: dist/**/*
