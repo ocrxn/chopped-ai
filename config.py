@@ -1,32 +1,27 @@
 import os
 import sys
-from dotenv import load_dotenv
 import logging
-
-load_dotenv()
+from dotenv import load_dotenv
 
 if hasattr(sys, '_MEIPASS'):
     env_path = os.path.join(sys._MEIPASS, '.env')
-    logging.info(f"Looking for .env at: {env_path}")
-    logging.info(f".env exists: {os.path.exists(env_path)}")
-    load_dotenv(env_path)
 else:
-    load_dotenv()
+    env_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), '.env')
 
-logging.info(f"DATABASE_URL loaded: {bool(os.getenv('DATABASE_URL'))}")
-logging.info(f"APP_KEY loaded: {bool(os.getenv('APP_KEY'))}")
+load_dotenv(env_path)
 
+DATABASE_URL = os.getenv('DATABASE_URL')
+APP_KEY = os.getenv('APP_KEY')
 
-# Base directory
 if hasattr(sys, '_MEIPASS'):
     BASE_DIR = os.path.dirname(sys.executable)
 else:
     BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
-# Neon DB
-DATABASE_URL = os.getenv('DATABASE_URL')
+logging.info(f"Using env_path: {env_path}")
+logging.info(f"BASE_DIR: {BASE_DIR}")
+logging.info(f"DATABASE_URL found: {bool(DATABASE_URL)}")
 
-# Uploads & output
 UPLOAD_FOLDER = os.path.join(BASE_DIR, "uploads")
 JSON_FOLDER = os.path.join(BASE_DIR, "json")
 CLIPS_FOLDER = os.path.join(BASE_DIR, "clips")

@@ -40,14 +40,14 @@ jobs:
       - name: Create .env file (Linux/macOS)
         if: matrix.os != 'windows-latest'
         run: |
-          echo "DATABASE_URL=${{ secrets.DATABASE_URL }}" >> .env
+          echo "DATABASE_URL=${{ secrets.DATABASE_URL }}" > .env
           echo "APP_KEY=${{ secrets.APP_KEY }}" >> .env
 
       - name: Create .env file (Windows)
         if: matrix.os == 'windows-latest'
         run: |
-          Add-Content .env "DATABASE_URL=${{ secrets.DATABASE_URL }}"
-          Add-Content .env "APP_KEY=${{ secrets.APP_KEY }}"
+          Set-Content -Path .env -Value "DATABASE_URL=${{ secrets.DATABASE_URL }}"
+          Add-Content -Path .env -Value "APP_KEY=${{ secrets.APP_KEY }}"
 
       - name: Build executable
         run: >
@@ -56,7 +56,7 @@ jobs:
           --name "${{ matrix.output_name }}"
           --add-data "templates${{ matrix.separator }}templates"
           --add-data "static${{ matrix.separator }}static"
-          --add-data ".env${{ matrix.separator }}.env"
+          --add-data ".env${{ matrix.separator }}."
           --hidden-import imageio
           --collect-all imageio
           main.py
@@ -71,16 +71,13 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     if: startsWith(github.ref, 'refs/tags/')
-
     permissions:
       contents: write
-
     steps:
       - name: Download all artifacts
         uses: actions/download-artifact@v4
         with:
           path: dist/
-
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:

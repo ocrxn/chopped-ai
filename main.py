@@ -17,14 +17,14 @@ logging.basicConfig(filename="app.log",
                     format="%(asctime)s - %(levelname)s - %(message)s")
 
 from db_conn import Connection
-from config import UPLOAD_FOLDER, CLIPS_FOLDER, ZIP_FOLDER
+from config import UPLOAD_FOLDER, CLIPS_FOLDER, ZIP_FOLDER, APP_KEY
 from file_handling import compress_video, zip_clips
 from json_maker import create_json_file
 from processor import run_processor
 
 app = Flask(__name__)
 load_dotenv()
-app.secret_key = os.getenv('APP_KEY')
+app.secret_key = APP_KEY
 
 app.config['MAX_CONTENT_LENGTH'] = 1024*1024 * 1024 * 15
 
