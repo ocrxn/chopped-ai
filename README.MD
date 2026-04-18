@@ -1,5 +1,42 @@
-# Developer Notes
-# How to Run Chopped-AI
+# Running the software (USER GUIDE)
+## 0. Install ffmpeg - required external package for software to work
+### Windows
+#### Using Chocolatey
+`choco install ffmpeg`
+### Else (https://www.gyan.dev/ffmpeg/builds/)
+#### Download *ffmpeg-release-essentials.zip*, extract, and run .exe
+### MacOS - Requires Homebrew
+`brew install ffmpeg` 
+### Linux
+`sudo apt update`
+
+`sudo apt install ffmpeg`
+
+## 1. Click on the latest release and download the executable for your OS (ex: for Mac download app-macos)
+## 2. Run the software
+### Note: this software is unverified and will almost certainly be flagged by all antivirus checkers. 
+### a. MacOS: The file is unverfied so MacOS tries to block it. Run these first two commands to enable read/write and bypass checking before running the software.
+`chmod +x app-macos`
+
+`xattr -cr app-macos`
+
+`./app-macos`
+### b. Linux
+`chmod +x app-linux`
+
+`./app-linux`
+### c. Windows
+#### Double click the exe. Windows Defender will try to block it. Click run anyway. 
+#### Accept any other prompts (e.g. Allow this file to make changes, ...)
+
+## 3. The terminal won't display any logs: check the app.log file generated in the same dir as the executable to see info and error statements. You should see "... INFO - Serving on http://0.0.0.0:5050" indicating the server has initiated.
+## 3. Navigate to http://127.0.0.1:5050
+## 4. Sign in/create account and then navigate to the upload route
+## 5. When done using the software, turn off the software by KILLING the terminal (end task / ctrl - c, not just closing window)
+## 6. Feel free to delete the uploads, json, clips, and zips folders once you have download the result zip file. 
+### Note: Feature will be added soon to automatically clean up folders and residual files.
+
+# Running the software (Developer Guide)
 ## 1. Download python if not already (https://www.python.org/downloads/)
 ### Add to PATH
 ### Install Python Extension in VSCode
