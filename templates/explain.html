@@ -9,39 +9,56 @@
   <div class="main__container">
       <div class="main__content">
             <h1>How it Works</h1>
+            <br>
+            <br>
 <!-- Step 1 --> 
             <h2>Step 1 Media Upload</h2>
-            <p>Users uploads media in the form of a video file and audio file, or just a video file with audio</p>
+            <p>Users upload media in the form of a video file (separate audio file acceptable) which must include the spoken keywords for each play.</p>
             <button class="main__btn"><a href="{{ url_for('upload') }}">Get Started</a></button>
         </div>
       <div class="main__image">
           <img src="static\images\Upload.svg" alt="upload Image" id="main__img">
-      </div>
+      </div> 
 <!-- Step 2 -->
-        <div class="main__image">
-          <img src="static\images\compress.svg" alt="upload Image" id="main__img">
-        </div>
-      <div class="main__content">
-            <h2>Step 2 Video Compression</h2>
-            <p>The video file is then compressed into a zip and readable file for our backend</p>
-        </div> 
-<!-- Step 3 -->
-        <div class="main__content">
-            <h2>Step 3 Media to Backend</h2>
-            <p>Uploaded files are sent to the backend “server” and the video is processed</p>
-        </div>
         <div class="main__image">
           <img src="static\images\backend.svg" alt="upload Image" id="main__img">
         </div>
+        <div class="main__content">
+            <h2>Step 2 Media to Backend</h2>
+            <p>Uploaded files are moved to the backend folder where they are stored and prepared for processing.</p>
+        </div>
+<!-- Step 3 -->
+        <div class="main__content">
+            <h2>Step 3 Extracting Key Events</h2>
+            <p>Detect audio corresponding to keywords and pair them with the timestamp where they occurred.</p>
+        </div>
+        <div class="main__image">
+                <img src="static\images\extract.svg" alt="upload Image" id="main__img">
+        </div>
 <!-- Step 4 -->
         <div class="main__image">
-                <img src="static\images\backend.svg" alt="upload Image" id="main__img">
+          <img src="static\images\match.svg" alt="upload Image" id="main__img">
         </div>
         <div class="main__content">
-            <h2>Step 3 Media to Backend</h2>
-            <p>Uploaded files are sent to the backend “server” and the video is processed</p>
+            <h2>Step 4 Match Files</h2>
+            <p>Event data is matched with the corresponding video file to ensure that detected key moments are applied to the correct game footage.</p>
         </div>
-        
+<!-- Step 5 -->
+        <div class="main__content">
+            <h2>Step 5 Cut Clips</h2>
+            <p>Segment video into clips based on detected key event timestamps.</p>
+        </div>
+        <div class="main__image">
+                <img src="static\images\cut.svg" alt="upload Image" id="main__img">
+        </div>
+<!-- Step 6 -->
+        <div class="main__image">
+          <img src="static\images\return.svg" alt="upload Image" id="main__img">
+        </div>
+        <div class="main__content">
+            <h2>Step 6 Return Clips to User</h2>
+            <p>Generated clips are packaged and returned to the user through the web interface.</p>
+        </div>
     </div>
 </div> 
 
@@ -53,6 +70,7 @@
                 <h2>Chopped</h2>
                 <a href="/explain">How It Works</a>
                 <a href="/about">About Us</a>
+                <a href="/team">Meet the Team</a>
             </div>
             <div class="footer__link--items">
                 <h2>Contact Us</h2>

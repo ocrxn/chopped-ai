@@ -17,14 +17,14 @@
   {% endif %}
 {% endwith %}
 
-  <h1>Profile</h1>
-  <h2>Username:  {{ session.get("user") }} </h2>
+  <h1 style="padding-left: 20px;">Profile</h1>
+  <h2 style="padding-left: 20px;">Username:  {{ session.get("user") }} </h2>
 
-  <h1>Settings</h1>
+  <h1 style="padding-left: 20px;">Settings</h1>
 
   <!--Delete Account Form-->
   <input type="checkbox" id="confirm-toggle" hidden>
-  <label for="confirm-toggle" class="delete-btn">Delete</label>
+  <label for="confirm-toggle" class="delete-btn" >Delete</label>
   <div class="modal">
     <div class="modal-box">
       <h3>Delete your account?</h3>
@@ -46,7 +46,7 @@
   <!--Shutdown flask server-->
   {% if session.get("user") == 'admin' %}
     <div class="shutdown">
-      <h2>⚠️Admin Panel⚠️</h2>
+      <h2 style="padding-left: 20px;">⚠️Admin Panel⚠️</h2>
       <form action="{{ url_for('shutdown') }}" method="POST" style="display: inline;">
         <button type="submit" class="shutdown-btn">Shutdown Flask Server</button>
       </form>

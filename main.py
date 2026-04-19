@@ -366,6 +366,12 @@ def explain():
     """
     return render_template("explain.html")
 
+@app.route("/team")
+def team():
+    """
+    Return team page
+    """
+    return render_template("team.html")
 
 @app.route("/shutdown", methods=["POST"])
 def shutdown():

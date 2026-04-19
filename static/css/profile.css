@@ -21,6 +21,14 @@ h1 {
   text-align: center;
 }
 
+.modal h3{
+  color: black;
+}
+
+.modal p{
+  color: black;
+}
+
 #confirm-toggle:checked ~ .modal {
   display: block;
 }
@@ -28,6 +36,7 @@ h1 {
 .delete-btn {
   background: red;
   color: white;
+  margin-left: 20px;
   padding: 8px 14px;
   cursor: pointer;
 }
@@ -35,6 +44,7 @@ h1 {
 .cancel-btn {
   margin-right: 10px;
   cursor: pointer;
+  color: black;
 }
 
 #confirm-delete {
